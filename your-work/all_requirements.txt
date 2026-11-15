@@ -1,0 +1,63 @@
+=== WORKLIST_A (40) ===
+1. [R102] Are there any restrictions on IATs that the State should be aware of?
+2. [R316] Provide biographical information on the individuals who will work with the State on a regular basis. Please include the following information: • Proposed role with regard to DOA's account; • Biographical information; • Location; • Experience working with other government entities; • Number of years of experience in this field; • Number of years with Firm; and, • Number of accounts the person is responsible for.
+3. [R310] How often does your Firm test disaster recovery procedures? When was the site last tested?
+4. [E022] If a State employee needs assistance after business hours, what support is available?
+5. [E115] Describe the post implementation support that will be provided for the State. Include the philosophy and approach to providing the technical and functional post implementation support requested and identify the resources it would make available to the State to provide this support.
+6. [R025] Describe the bank’s procedures for complying with the U.S. Treasury Department’s Office of Foreign Assets Control (“OFAC”) regulations. When was the last time an independent test of the bank’s OFAC program was conducted by internal audit, outside auditors, consultants, or other qualified independent party?
+7. [E123] Please do not list any State entity, officer or employee as a business reference.
+8. [E016] Are there any disaster recovery plans specific to this component that are not outlined in the Disaster Recovery plan requested on page 13 and 14, Tab H?
+9. [E125] Please complete excel file entitled Requirements Matrix attached to this document.
+10. [R108] Is automatic funding of the controlled disbursement account from a main account possible?
+11. [R341] Can the State establish card limits on a real-time basis? Card limits include both a per transaction dollar limit, as well as a monthly dollar limit.
+12. [R267] Will the Firm process and deposit all of the State’s payments on the same ledger day as received? If not, when are these items deposited?
+13. [E034] What changes has your Firm made or are anticipating to make due to the new prepaid rules established by the CFPB?
+14. [E095] How will the State transmit check payment information to the bank?
+15. [R001] Provide the following background of your organization— • Legal name of entity • Legal structure of entity (corp., LLC, LP, etc.) • Company’s address • Year Founded • Number of employees • Parent company (or equivalent) or controlling stakeholder • State of incorporation or formation
+16. [E124] If you have held a State contract within the last 5 years, provide a separate list of the contract(s), describe the scope of work performed and include the name, title, phone number and email address for your primary contact for each engagement.
+17. [R142] With ACH debit blocking, does the Firm notify the State of attempts to debit funds that have been automatically rejected?
+18. [R345] For cards issued with an EMV, will a pin number be required for face-to-face transactions? If so, how will the pin number be assigned and communicated to the employee?
+19. [R244] Provide an organizational chart that includes these individuals.
+20. [E027] Describe how the cards are tied to an account at a financial institution; is the account owned by the recipient, the State, or is the card tied to a For Benefit of (“FBO”) account? Explain the ownership and structure of the FBO account.
+21. [E102] Describe the process that your Firm would use to verify that all records have been received and processed.
+22. [R012] Describe the company’s process on changing the primary contact person on an account at your discretion.
+23. [E122] List a minimum of four business references. At least two (2) of the references should be from government entities. Business references should include the following information: • Business name and mailing address • Contact name, phone number and email address • Number of years doing business with • Type of work performed
+24. [R237] How are implementation managers or implementation teams assigned (i.e. availability, geographically, complexity of the transition)?
+25. [R381] In what formats, can these reports be downloaded? Are these reports downloaded from the web-based application? Are there alternative options for transmitting daily reports (i.e. FTP)?
+26. [R298] Provide any ideas or suggestions your Firm believes could improve the State’s overall use of lockbox services. Specifically, (a) reducing the number of lockboxes used by the State and/or State agencies, (b) new services that will benefit the State, (c) services the State could discontinue or replace, and (d) implementing best practices.
+27. [E051] What information is required for each individual card? Is the recipient required to provide their Social Security Number, physical address, date of birth, telephone number, other?
+28. [E100] Can a printed check be returned? How long does it take?
+29. [R010] Provide the name, title, address, phone number, and email address of the primary contact person(s) assigned to this account for each component.
+30. [R146] Discuss the process the State must use to set up repetitive wire transfers with the Firm, including communication methods (e.g., written request, fax, PC, Internet).
+31. [R420] If a supplier is already enrolled with your Firm’s payables platform, can these vendors be paid immediately or does your vendor enrollment team have to contact the vendor first? Is the process the same for ACH and card payments? If not, describe the differences.
+32. [R271] Describe processing options for the following types of exceptions: • Stub in envelope with no check • Check in envelope with no stub • Non-balancing remittances
+33. [E066] Provide any ideas or suggestions your Firm believes could improve the State’s stored value card program(s). Specifically, (a) issuance of cards and providing customer service to card recipients, (b) new services that will benefit the State, (c) services the State could discontinue or replace, and (d) implementing best practices.
+34. [E112] How are implementation managers or implementation teams assigned (i.e. availability, geographically, complexity of the transition)?
+35. [R003] Describe your company’s experience providing similar services for government entities, specifically states comparable to Delaware. Provide professional biographies of key employees that would be assigned to this engagement, as well as any relevant training and certifications they possess. Provide list of comparable government or public sector clients, including a description of services provided. i.e. General Banking, Lockbox, PCard, etc.
+36. [R047] How are RDC permissions managed (by location ID or account)?
+37. [R398] Once the Firm receives a payment instruction file, can the State instruct payments to be delayed and sent on a specific date or will payments be initiated immediate?
+38. [R296] Provide any additional information your Firm believes to be pertinent to your ability to provide this service but not specifically requested elsewhere in this RFP.
+39. [E017] Provide biographical information on the individuals who will work with the State on a regular basis. Please include the following information. • Proposed role with regard to OST’s account; • Biographical information; • Location; • Experience working with other government entities; • Number of years of experience in this field; • Number of years with Firm; and • Number of accounts the person is responsible for.
+40. [E106] Describe in detail any quality improvement program that your Firm has in place. Provide statistics or other regularly available performance data related to the level of service quality and any other data that demonstrates your commitment to quality improvement.
+
+=== WORKLIST_B (20) ===
+1. [R250] Does the Firm operate its own lockbox, or does it use the services of a third-party? If a third-party lockbox is used, name the lockbox operator and the length of time the operator has had a relationship with your Firm. Describe how the Firm oversees and monitors the third-party lockbox provider to ensure a high level of service.
+2. [R269] If a payment is received without the remittance document, does the Firm offer any technology that can aid in determining the customer account?
+3. [R310] How often does your Firm test disaster recovery procedures? When was the site last tested?
+4. [R267] Will the Firm process and deposit all of the State’s payments on the same ledger day as received? If not, when are these items deposited?
+5. [R271] Describe processing options for the following types of exceptions: • Stub in envelope with no check • Check in envelope with no stub • Non-balancing remittances
+6. [R283] In what standard formats does the Firm transmit? Confirm that the Firm can transmit in BAI format. How will this information be transmitted (website, file transfer, etc.)?
+7. [R278] Describe the reporting capabilities of the Firm’s web-based lockbox portal.
+8. [R295] Describe any new services or ideas that will enhance the State’s use of lockbox services.
+9. [R270] How are checks processed for deposit (physical deposit vs ICLs)?
+10. [R266] What controls does the Firm have in place to ensure accurate processing per customer specifications?
+11. [R292] Does the Firm offer eLockbox services? If so, describe the Firm’s eLockbox service.
+12. [R261] Describe the process of establishing processing procedures for each of the State’s lockboxes. Who is involved with these discussions (i.e. relationship manager, implementation coordinator, lockbox specialist)?
+13. [R285] If selected as a finalist, can the State tour your Firm’s lockbox operation?
+14. [R289] Can the Firm’s lockbox operation process credit/debit card payments? What merchant card processor would you propose to use for these transactions?
+15. [R303] Indicate the Firm’s plans for initial and ongoing education and training of OST and State agency employees in the use of the Firm’s systems.
+16. [R262] Will your Firm provide a document to the State outlining the processing procedures for each lockbox? If so, please provide a sample of this document for a similar type of lockbox.
+17. [R251] What type of lockbox solution is the Firm proposing for each of the State’s lockboxes (wholesale, retail, wholetail)?
+18. [R311] Have disaster recovery procedures ever been employed for a real disaster? If so, explain.
+19. [R254] Does the Firm have a unique five-digit zip code assigned exclusively for receipt of lockbox items?
+20. [R255] If the State has a preference to use a Delaware P.O. Box, can the Firm accommodate this request? If so:

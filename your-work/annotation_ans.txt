@@ -1,0 +1,443 @@
+Here are the detailed, source-grounded answers to your specific RFP questions based on U.S. Bank’s proposal:
+
+ 1. [R102] International ACH Transactions (IAT) Restrictions
+Both U.S. Bank and the remitting party are subject to U.S. laws and regulations that may prohibit transactions to and from certain countries. 
+
+---
+
+ 2. [R316] Biographical Information for Key Proposed Personnel
+
+ Bobbi Michalowski
+   Proposed Role: Treasury Management Government Banking Relationship Manager.
+   Biographical Information: Excelling in sales since 1998, she has extensive professional banking experience. She resides in Virginia and supports clients in DE, MD, VA, DC, SC, and NC.
+   Location: Williamsburg, Virginia.
+   Experience with Other Government Entities: 12 years in her current role at U.S. Bank.
+   Years in Field / with Firm: In banking since 2002; 12 years with U.S. Bank.
+   Number of Accounts: Currently manages 15 accounts.
+
+ Dave Sullender
+   Proposed Role: Treasury Management Sales Consultant.
+   Biographical Information: Earned a Bachelor’s in Business Administration (University of Massachusetts) and a Master’s (Ohio State University). He is a Certified Treasury Professional and a member of the Association for Financial Professionals since 1992.
+   Location: Dayton, Ohio.
+   Experience with Other Government Entities: Responsible for treasury management sales for government markets along the eastern seaboard and West to Ohio for 14 years.
+   Years in Field / with Firm: 32 years of banking experience, with 25 years in treasury management. He joined U.S. Bank in 2004 (14 years with the firm at proposal date).
+   Number of Accounts: Currently manages 100 accounts.
+
+ Erin Scott
+   Proposed Role: Dedicated Commercial Customer Service (CCS) Representative.
+   Biographical Information: Joined the Cincinnati Commercial Customer Service team three years ago.
+   Location: Cincinnati, Ohio.
+   Experience with Other Government Entities: 3 years of experience supporting government clients.
+   Years in Field / with Firm: 10 years with the firm; 3 years in her current servicing role.
+   Number of Accounts: Dedicated CCS representative for 3 clients, in addition to providing general client support.
+
+ Stephen Jacobs
+   Proposed Role: Corporate Payment Systems Relationship Manager.
+   Biographical Information: Holds a BS in Government and Communication. He previously served as a government/healthcare/not-for-profit corporate relationship manager in the merchant services division at Chase, and as an RM with American Express.
+   Location: New York City, New York.
+   Experience with Other Government Entities: 25 years of experience in the financial and banking industry, including working with government entities.
+   Years in Field / with Firm: 25 years of industry experience. Years with the firm are not explicitly detailed.
+   Number of Accounts: Oversees clients in various states across the U.S. Bank footprint.
+
+ Kelli Keller
+   Proposed Role: Retail Payment Solutions (Prepaid) Relationship Manager.
+   Biographical Information: Holds a Bachelor's degree in psychology. Experienced in public sector relationship management, implementation project management, technology development, and training.
+   Location: Minneapolis, Minnesota.
+   Experience with Other Government Entities: More than 6 years of experience managing public sector portfolios.
+   Years in Field / with Firm: 6 years of experience; 6 years with U.S. Bank.
+   Number of Accounts: Oversees clients across 6 states, with programs ranging from child support and unemployment to retirement and worker’s compensation.
+
+---
+
+ 3. [R310] Disaster Recovery Testing Frequency
+   Testing Frequency: U.S. Bancorp prepares, updates, and tests its business continuity and disaster recovery plans on an annual basis. Additionally, key mission-critical applications are exercised on a quarterly basis.
+   Last Tested Date: The specific last test date is not disclosed in the proposal passages.
+
+---
+
+ 4. [E022] After-Hours Employee Assistance
+   General Banking: State employees can contact U.S. Bank 24-Hour Banking, which provides around-the-clock general support and can execute loss-prevention services (e.g., stop payments, fraud blocks, card maintenance).
+   Purchasing & Virtual Card: Program Administrators have access to a 24/7 Technical Help Desk and Customer Service Center. Cardholders are supported by an in-house 24/7/365 Customer Service Center.
+   Stored Value Cards: Program Administrators can access emergency after-hours client support via a monitored voicemail system, where an on-call manager will respond within one hour. Stored value cardholders also have 24/7 live agent support.
+
+---
+
+ 5. [E115] Post-Implementation Support Philosophy and Resources
+U.S. Bank's philosophy is "with you every step of the way".
+   General Banking Support: Post-implementation support is directed by your Relationship Manager (Bobbi Michalowski) and CCS Representative (Erin Scott). Benefits include heightened staffing coverage, detailed planning and contingency, thorough testing, and focused remittance transition.
+   Purchasing/Virtual Card Support: The implementation team remains engaged for at least one full billing cycle to monitor usage, payment processing, and system integration. Afterward, support transitions smoothly to your Relationship Manager (Stephen Jacobs) and your Dedicated Account Coordinator (Shannon Ness).
+   Stored Value Card Support: Kelli Keller (Relationship Manager) provides ongoing strategic program support, advocacy, contract reviews, and product updates, backed by Scott Louie's Client Support Operations team for day-to-day technical issues.
+
+---
+
+ 6. [R025] OFAC Complying Procedures and Independent Audits
+   Compliance Procedures: All transactions are screened in real-time for OFAC compliance. U.S. Bank cross-checks all trading partners and suppliers against OFAC and OSFI terrorist lists. If a potential match is flagged, the bank's compliance team contacts the State to obtain additional verification.
+   OFAC Independent Audits: Audits of the bank's OFAC program are conducted on an annual basis by internal audit, regulatory examiners, or independent parties. The exact date of the last test is not specified in the passages.
+
+---
+
+ 7. [E123] Business References Constraint
+U.S. Bank acknowledges this requirement and has supplied references in Attachment 6 from entities outside the State of Delaware.
+
+---
+
+ 8. [E016] Component-Specific Disaster Recovery Plans
+   General Banking (Component 1) & Purchasing Cards (Component 3): No component-specific plans exist beyond the comprehensive enterprise recovery procedures outlined in Tab K.
+   Stored Value Cards (Component 4): Standard enterprise disaster recovery plans apply. Critical processing systems are mirrored with near real-time replication to a geographically separate data center.
+
+---
+
+ 9. [E125] Requirements Matrix
+U.S. Bank has completed and returned the Requirements Matrix as requested in Attachment 2 (Tab C).
+
+---
+
+ 10. [R108] Controlled Disbursement Automatic Funding
+Yes, automatic funding of a controlled disbursement account from a master demand deposit account is fully supported.
+
+---
+
+ 11. [R341] Real-Time Card Limit Adjustments
+Yes. Through Access Online, Program Administrators have the authority to establish and adjust transaction, daily, cycle, and monthly card limits on a real-time basis.
+
+---
+
+ 12. [R267] Same Ledger Day Posting
+   Remote Deposit Capture (RDC) & Image Cash Letter (ICL): Deposits have a ledger cutoff time of 11:00 p.m. ET for same-day credit.
+   Smart Safes: Funds deposited into a smart safe on Day 1 are transmitted and credited to the State’s account on Day 2.
+
+---
+
+ 13. [E034] Prepaid Rule Changes (CFPB)
+U.S. Bank proactively updated its card packets, disclosure materials, and cardholder collateral to align with the new CFPB rules ahead of the regulatory deadlines. The bank has also provided pre-release compliance documents directly to state clients to help them prepare.
+
+---
+
+ 14. [E095] Check Payment Information Transmission
+Check issue and cancellation information can be transmitted to the bank in two ways:
+1.  Direct File Transmission: Batch files uploaded securely.
+2.  SinglePoint Issue Maintenance Portal: Administrators can manually key in issues or cancellations, with updates updating the positive pay system within 30 minutes and teller lines within 10 minutes.
+
+---
+
+ 15. [R001] U.S. Bank Corporate Background
+   Legal Name: U.S. Bank National Association
+   Legal Structure: National Association (National Bank)
+   Company Address: Headquartered in Minneapolis, Minnesota
+   Year Founded: 1863 (via predecessor First National Bank of Cincinnati)
+   Number of Employees: Approximately 74,000 employees
+   Parent Company: Wholly owned subsidiary of U.S. Bancorp
+   State of Incorporation: U.S. Bank is formed under federal national banking laws. Its parent, U.S. Bancorp, is incorporated in Delaware.
+
+---
+
+ 16. [E124] Prior State Contracts (Last 5 Years)
+U.S. Bank currently partners with 18 state governments for commercial card programs and manages 25+ state government prepaid card programs (including Alaska, California, Colorado, Idaho, Oregon, Washington, Texas, Louisiana, Pennsylvania, and others). Specific contact names, phone numbers, or emails for these clients are omitted from the proposal text to maintain client confidentiality.
+
+---
+
+ 17. [R142] ACH Debit Blocking Rejection Notifications
+No. U.S. Bank does not notify the State when attempts to debit blocked funds are rejected, and there are no customer-facing ACH block rejection reports.
+
+---
+
+ 18. [R345] EMV Chip and PIN Requirements
+Our cards are signature-preferring, meaning a PIN will rarely be required for face-to-face transactions inside the U.S.. However, a PIN may be requested abroad. 
+   Assignment/Communication: Cardholders select their own PIN securely over the phone during card activation via the Customer Service Center. No PINs are printed or mailed, which reduces security risks.
+
+---
+
+ 19. [R244] Organizational Chart
+Basic organizational structures are provided in the response. Complete, detailed organizational charts for each component (General Banking, Corporate Payment Systems, and Retail Payment Solutions) are submitted within the Exhibits Section (Exhibits 25 and 558).
+
+---
+
+ 20. [E027] Stored Value Card Account Tie / FBO Structure
+The stored value cards do not establish a standard bank account in the recipient's name and are not tied to a "For Benefit Of" (FBO) account. Funds are directly owned by the individual recipient, not by the State. 
+
+---
+
+ 21. [E102] Verification of Received and Processed Records
+   ACH Transmissions: Verified using IVR control total matching. The ACH File Confirmation system cross-checks transmitted totals against the totals reported by the State to detect file discrepancies within 30 minutes. It also screens for duplicate files submitted in the prior 30 days.
+   Stored Value Card Enrollments: Verified via an enrollment acknowledgment response file transmitted to the State within two hours of receipt, which lists all successful enrollments (with routing and account numbers) and details any records that failed formatting checks.
+
+---
+
+ 22. [R012] Primary Account Contact Changes
+If U.S. Bank must change your primary contact, the State will be notified immediately. An interim manager will be assigned to cover your accounts until a permanent successor is selected, with Cincinnati Commercial Customer Service serving as additional backup during the transition.
+
+---
+
+ 23. [E122] Business References
+U.S. Bank has supplied separate business references for each of the proposed components in Attachment 6 (with summary details also located in Tab J). 
+   Availability of Specific Contacts: The proposal passages state that references from outside the State of Delaware are included in the submittal. However, the specific names, mailing addresses, phone numbers, emails, years of business, and precise descriptions of work performed for these references are not contained in the available text passages and must be viewed directly in Attachment 6.
+
+---
+
+ 24. [R237] Assignment of Implementation Managers and Teams
+The assignment of implementation project managers and support teams depends on the specific component and products being transitioned:
+   General Banking (Component 1): Implementation teams are assembled based on the specific products and services the State selects. U.S. Bank conducts further assessments of the State's unique workflows and requirements upon selection to align the correct specialists.
+   Purchasing & Virtual Card (Component 3): Implementation project managers are assigned based on a combination of technical expertise (with priority given to highly complex public sector transitions like the State's), skills, abilities, and workload balance among staff. Other team members are assigned by industry/sector and geography (e.g., your relationship manager, Stephen Jacobs, and sales representative, Ryan Calloway, are dedicated specifically to public sector clients in the eastern United States).
+   Stored Value Cards (Component 4): Onboarding managers are assigned based first on the complexity of the transition, and then on the manager's immediate availability.
+
+---
+
+ 25. [R381] Reporting Formats, Downloading, and FTP Transmission
+   Download Formats: Reports can be downloaded and exported in several formats:
+       PDF: Readily formatted for printing, downloading, and email exchange.
+       Excel (XLS/CSV): Standard spreadsheet structure for additional sorting, filtering, and analysis.
+       Browser/Active: Openable directly in standard web browsers, with "Active" files utilizing dynamic HTML to offer interactive sorting, filtering, charts, and direct export to XML and CSV.
+   Web-Based Application: Yes, all standard and customized reports are accessed, scheduled, and downloaded 24/7 directly from the web-based portal, Access Online.
+   Alternative Transmission Options (i.e., FTP): Yes, there are alternative options for transmitting daily report data:
+       Data File Delivery: U.S. Bank can directly transmit a raw report data file to the State’s servers at a frequency directed by the State.
+       Access Online Data Exchange: Scheduled reports can be securely delivered directly to a secure mailbox utilizing Transport Layer Security (TLS 1.2) 256-bit encryption.
+       Direct File Protocols: Supported direct transmission protocols include SFTP (SSH), FTP, HTTPS, FTPS (SSL), Connect:Direct (VPN), and AS2.
+
+---
+
+ 26. [R298] Lockbox Services Suggestions and Ideas
+U.S. Bank did not submit a proposal for Lockbox Services (Component 2), marking this section as "Not applicable" in their questionnaire. Consequently, they do not provide specific answers or proposals regarding the State’s physical lockbox operations under R298.
+   Related Best Practice Collections Suggestions: Within their General Banking (Component 1) response, U.S. Bank suggests two key electronic collection methodologies to help the State transition away from physical paper processing:
+    1.  E-Lockbox ACHs: It is recommended as a best practice to have the concentration bank provide automated E-Lockbox ACH services to streamline electronic receivables.
+    2.  VantagePoint: A centralized receivables management platform that captures, identifies, and matches ACH transactions by Company ID (identifying the sender) to automate cash application and improve workflow.
+
+---
+
+ 27. [E051] Required Cardholder Information
+The required information differs based on the type of card program being utilized:
+   Stored Value Cards (Component 4 - ReliaCard): To enroll a recipient and establish a card account, the following information is required in the daily enrollment file:
+       First Name and Last Name
+       Physical Address (Address Line 1, City, State, Country, ZIP Code) (A P.O. Box is acceptable as a contact mailing address, but a physical address must be provided during enrollment).
+       Date of Birth
+       Social Security Number (SSN) or an acceptable unique identification alternative such as an Individual Taxpayer Identification Number (ITIN).
+       Note on Telephone Numbers: A telephone number is not mandatory in the list of required elements for the enrollment file, but home/mobile phone numbers can be optionally updated to support text/email alerts.
+   Purchasing & One Cards (Component 3): Under U.S. Bank's proposed corporate liability program, no Social Security Numbers are required and no credit checks are performed on employees. To set up an account, the program administrator must provide the employee's legal name, legal address, date of birth (required to prevent OFAC flags), work phone, and email address. 
+
+---
+
+ 28. [E100] Return of Printed Checks
+U.S. Bank did not propose for Check Printing Services (Component 5), designating this section of their proposal as "Not applicable". Therefore, they did not complete the questionnaire regarding the return procedures or timelines for printed checks under E100.
+   Alternative Check Disbursals: Under Virtual Pay (Component 3), U.S. Bank offers Supplier Prefer Pay, which prints and mails physical paper checks via their vendor, Apex, for suppliers who reject electronic payments. These checks automatically integrate with positive pay systems, and their expiration/reversal parameters can be managed by the State.
+
+---
+
+ 29. [R010] Primary Assigned Contact Persons
+The assigned contact persons, titles, addresses, and contact info for each component are:
+   Component 1: General Banking
+       Primary RM: Bobbi Michalowski, Vice President & Relationship Manager.
+       Address: U.S. Bank Government Banking, Williamsburg, VA 23185.
+       Phone / Email: 757.345.3877 | roberta.michalowski@usbank.com.
+       Treasury Management Sales: Dave Sullender, Vice President & Sales Consultant (10 N Ludlow St, Dayton, OH 45402; Phone: 937.640.7610; Email: david.sullender@usbank.com).
+       Routine Support: Erin Scott, Dedicated Commercial Customer Service (CCS) Representative (Cincinnati Commercial Customer Service; Mon–Fri, 8 a.m. to 8 p.m. ET).
+   Component 2: Lockbox Services
+       Status: Not applicable.
+   Component 3: Purchasing/Virtual Card & ePayables
+       Primary RM: Stephen Jacobs, Relationship Manager, Corporate Payment Systems.
+       Address: 1095 Avenue of the Americas, 13th Floor, New York, NY 10036.
+       Phone / Email: 646.971.4942 | stephen.jacobs@usbank.com.
+       Routine Support: Cardholders are supported 24/7/365 by in-house Customer Service Centers. Program Administrators are supported by Shannon Ness, Dedicated Account Coordinator (Minneapolis, MN; Mon–Fri, 8 a.m. to 8 p.m. ET).
+   Component 4: Stored Value Card
+       Primary RM: Kelli A. Keller, Relationship Manager, Retail Payment Solutions.
+       Address: U.S. Bank Plaza Minneapolis, 200 S 6th St, Minneapolis, MN 55402.
+       Phone / Email: 612.973.2799 | kelli.keller@usbank.com.
+       Routine Support: Managed by Scott Louie, Vice President, Client Support Operations (Jacksonville, FL; Mon–Fri, 8 a.m. to 8 p.m. ET). Urgent after-hours emergencies are supported via a monitored voicemail system with an on-call manager responding within one hour.
+   Component 5: Check Printing Services
+       Status: Not applicable.
+
+---
+
+ 30. [R146] Process to Set Up Repetitive Wire Transfers
+The State has three communication options to establish repetitive wire transfers:
+1.  Internet (SinglePoint): Program Administrators can request repeat codes online directly through SinglePoint. They can also create wire transfer templates that store repetitive wire data. For security, SinglePoint templates are treated as non-repetitive transactions because they can be modified by a single authorized user.
+2.  Mail: If SinglePoint is not utilized, mailing the bank's authorized request form is the standard manual method to establish repeat codes.
+3.  Other / Repetitive Form: Administrators can complete the physical Wire Transfer Repetitive Transfer Authorization form. Once established, these repeat codes are uploaded into SinglePoint for easy online execution. If utilizing a CPU-to-CPU batch wire system, repeat codes can be embedded directly within the State's transmitted files.
+   Turnaround Time: Online requests for repeat codes are processed and ready for use within five business days. U.S. Bank provides both an online confirmation message and a mailed physical confirmation when the repeat code is active.
+
+---
+
+ 31. [R420] Paying Already Enrolled Payables Platform Suppliers
+   Contact/Due Diligence Prerequisite: If a State supplier is already enrolled on U.S. Bank's payables platform under another buyer’s program, U.S. Bank must still contact that vendor before payment can be made.
+   Is the Process the Same for ACH and Card? Yes. The process is identical for both Virtual Pay and ACH payments. U.S. Bank must complete its due diligence requirements and confirm that any payment made on behalf of the State is routed to the correct account and individual for that specific, unique buyer-supplier relationship.
+
+---
+
+ 32. [R271] Lockbox Exception Processing Options
+Because U.S. Bank did not propose for Lockbox Services (Component 2), this questionnaire section is marked as "Not applicable".
+   On-Site Check Depositing Exceptions: For check deposits processed locally via On-Site Electronic Deposit (RDC), the system features a Balance Batches module. If a batch does not match the control total, the user is alerted to review the check images, correct amount errors (e.g., courtesy amount mismatches), or adjust the batch control total before the deposit can be submitted.
+
+---
+
+ 33. [E066] Stored Value Card Program Improvement Suggestions
+U.S. Bank proposes several enhancement strategies for the State’s stored value program:
+   (a) Card Issuance and Recipient Customer Service: Establish an Instant Issue Program. Under this model, State administrative offices maintain a secure inventory of blank, un-funded card packets. When a recipient needs an emergency card, administrators can enroll them via the real-time administrative portal and fund the card instantly using a pre-funded adjustment account. 
+   (b) New Services for the State: Implement U.S. Bank's recently launched features:
+       Enhanced Alerts: Provide real-time text/email notifications to cardholders for transaction thresholds, international activity, and card-not-present purchases.
+       Bilingual Spanish Support: Spanish versions of the cardholder website, IVR, alerts, welcome packets, mobile app, and written dispute correspondence.
+   (c) Services to Discontinue/Replace: Expand the Stored Value program to discontinue expensive paper checks for payroll, pensions, tax refunds, foster care payments, and unclaimed property. 
+   (d) Implementing Best Practices: Standardize careful documentation of workflows, roles, and technical file integration from the outset of implementation to minimize operational friction.
+
+---
+
+ 34. [E112] Assignment of Stored Value Implementation Managers/Teams
+This is identical to R237. Stored value onboarding project managers are assigned based on the complexity of the State's program transition, and then on the availability of the onboarding managers. Kelli Keller serves as your primary RM, supported by Abby Kutschied as your onboarding project manager.
+
+---
+
+ 35. [R003] Government Experience and Personnel Biographies
+   Government Experience: U.S. Bank's Government Banking division supports over 5,000 public sector relationships across all 50 states, including full-relationship banking services for over 22 state governments (e.g., Alaska, California, Colorado, Idaho, Oregon, Washington, Texas, and Pennsylvania). Their Stored Value division manages 25+ state government prepaid programs.
+   Key Personnel Biographies:
+       Bobbi Michalowski (Relationship Manager): In banking since 2002; 12 years in her current role at U.S. Bank; manages 15 accounts.
+       Dave Sullender (TM Consultant): Joined the firm in 2004; 32 years of banking experience; Certified Treasury Professional (CTP); manages 100 accounts.
+       Stephen Jacobs (Purchasing RM): 25 years of financial industry experience; previously served as government RM at Chase Merchant Services and RM at American Express; manages clients nationwide.
+       Kelli Keller (Stored Value RM): Over 6 years of financial industry experience (all with U.S. Bank); manages portfolios across 6 states.
+       Abby Kutschied (SVC Onboarding Manager): 10 years in the field (7 years with the bank); has implemented prepaid programs for over 150 clients.
+
+---
+
+ 36. [R047] Remote Deposit Capture (RDC) Permission Management
+   Management Level: Permissions are managed by both location ID and account depending on user roles.
+   Role-Based Access: A Corporate Administrator manages system access within a hierarchical tree. High-level administrators can view and execute deposits across all member nodes, whereas restricted users (e.g., those assigned the "Item Research" role) are strictly limited to viewing and depositing into their specific member location or assigned account.
+
+---
+
+ 37. [R398] Delaying or Warehousing Payments
+The ability to delay payments differs by the payment mechanism:
+   Supplier Prefer Pay (ACH & Check): Yes. ACH payments can be "warehoused" in the system with an assigned future payment date extended up to 30 days. Check payments, however, are printed and mailed the business day following file submission.
+   Virtual Pay (Component 3): No. U.S. Bank does not provide a payment-delay option for Virtual Pay. Payments are initiated and processed immediately upon successful transmission of the payment instruction file.
+
+---
+
+ 38. [R296] Additional Pertinent Information
+U.S. Bank highlights its strong culture of ethics, integrity, and exceptional financial soundness as key differentiators. They have been recognized as a World’s Most Ethical Company by the Ethisphere Institute for multiple consecutive years, and they were named the Most Trusted Company for Retail Banking by the Ponemon Institute. They bring a unique, single-provider prepaid infrastructure where they act as the issuing bank, program manager, and transaction processor under one management team to minimize third-party coordination risks for the State.
+
+---
+
+ 39. [E017] Key Regular Contacts Biographical Information
+This section is identical to R316. Please refer to R316 (from the first query) or R003 (Question 35 above) for the full biographical details, locations, roles, government experience, and account responsibility counts for Bobbi Michalowski, Dave Sullender, Erin Scott, Stephen Jacobs, and Kelli Keller.
+
+---
+
+ 40. [E106] Quality Improvement Program & Performance Data
+
+U.S. Bank operates a comprehensive quality improvement program built on rigorous performance monitoring, structured governance, and client feedback to drive high-quality service across its lines of business:
+
+   Weekly TM Operations Service Quality Meetings: Every Friday, U.S. Bank's senior management, IT, and operations managers review actual performance against Service Level Agreements (SLAs). These reviews assess system availability, accuracy, and responsiveness, and include root-cause analysis and remediation plans for any missed SLAs.
+   Manual Error Monitoring (Payee Positive Pay): For manual check image reviews under positive pay, the bank closely monitors accuracy by tracking errors made by representatives per 1,000 exception items. U.S. Bank maintains a strict quality target of no more than 0.75 errors per 1,000 exception items.
+   Prepaid Call Center "Center of Excellence": Led by Malu Ros (Senior Manager of Quality/Training), the prepaid call center operations team actively monitors call quality and maintains the following key performance benchmarks:
+       IVR Availability: The IVR system remains available to cardholders 99.90% of the time (excluding scheduled maintenance).
+       Time to Answer: At least 80% of live agent-assisted calls are answered within 45 seconds of transfer.
+       Call Abandonment Rate: No more than 6% of incoming calls are abandoned after 30 seconds.
+   Fulfillment and Card Onboarding Timeliness: Over the six months preceding the proposal, U.S. Bank achieved a success rate of greater than 99.7% in printing and mailing prepaid cards within two business days of receiving successful enrollment data.
+   Inquiry and Quality Trend Tracking: Routine and complex client inquiries are tracked within a centralized database, allowing relationship managers to monitor resolution times, identify service quality trends, and execute continuous improvement strategies.
+   Process Design Culture: U.S. Bank fosters a corporate culture that encourages employees at every level to contribute ideas to refine products and streamline processes, frequently adapting offerings directly based on client feedback.
+
+---
+
+ === WORKLIST_B (20) ===
+
+> Note on Lockbox Services: U.S. Bank did not submit a proposal for Lockbox Services (Component 2), designating this section of their proposal as "Not applicable". Therefore, questions directly related to physical lockbox operations, local postal codes, and specific lockbox exception-handling procedures are Not applicable to their proposed solution. Where relevant, alternative electronic processing equivalents proposed under General Banking (Component 1) or Corporate Payment Systems (Component 3) have been provided below.
+
+ 1. [R250] Lockbox Operator: Own vs. Third-Party & Oversight
+   Proposal Response: Not applicable. Lockbox Services (Component 2) were not proposed. 
+   Related Third-Party Oversight (RDC): For their proposed On-Site Electronic Deposit system, U.S. Bank partners with Deluxe Corporation to provide the client-facing user application and Electronic Deposit Manager (EDM) system. U.S. Bank manages and maintains direct oversight of this partner to ensure physical/digital security and system safeguards.
+
+ 2. [R269] Payment Received Without Remittance: Account Determination Technology
+   Proposal Response: Under Lockbox Services, this is Not applicable.
+   General Electronic Equivalents: For electronic receivables, U.S. Bank offers advanced matching and search technologies:
+       U.S. Bank VantagePoint: A centralized receivables management platform that captures, identifies, and automatically matches incoming ACH transactions by ACH Company ID (identifying the sender). Payer file names can be custom-defined and uploaded by the State to automate cash application and matching when paper stubs are absent.
+       On-Site Electronic Deposit (RDC): Scanner users can manually enter transaction information, and authorized administrators can execute advanced searches on up to 10 optional, user-defined fields (such as a secondary ID or remittance number) to resolve check deposits and determine accounts.
+
+ 3. [R310] Disaster Recovery Testing Frequency & Last Test Date
+   Testing Frequency: U.S. Bancorp prepares, updates, and tests its business continuity and disaster recovery plans on an annual basis. In addition, key mission-critical applications are exercised on a quarterly basis. Mainframe data is mirrored and replicated to a geographically separate hot site, and server backups are stored offsite in secured, climate-controlled environments.
+   Last Tested Date: The specific last test date is not disclosed in the provided proposal passages.
+
+ 4. [R267] Same Ledger Day Processing and Deposits
+   Proposal Response: Under Lockbox Services, this is Not applicable.
+   Alternative Proposed Deposit Methods (General Banking):
+       RDC & Image Cash Letters (ICL): Deposits have a late ledger cutoff time of 11:00 p.m. ET for same-day ledger credit. Files received by 5:55 p.m. ET are reported on current-day information reporting, and those received up to 11:00 p.m. ET receive same-day ledger posting, with full float availability on the next business day.
+       Smart Safes (Remote Cash Deposit): Cash deposited on Day 1 is transmitted as a posting file to U.S. Bank on Day 2, with ledger credit given on Day 2.
+
+ 5. [R271] Exception Processing Options (Missing Stubs/Checks & Non-Balancing)
+   Proposal Response: Not applicable. Physical lockbox exception processing was not detailed as Component 2 was not proposed.
+   General Check Balancing (RDC): For check deposits processed locally via On-Site Electronic Deposit (RDC), the system features a Balance Batches module. If a scanned batch does not balance with the control total, the user is alerted to review the check images, correct amount errors (e.g., courtesy amount mismatches), or adjust the batch control total before the deposit can be successfully closed and submitted.
+
+ 6. [R283] Standard Transmission Formats & Transmitting Method
+   BAI Format Confirmation: Yes. U.S. Bank fully confirms its ability to transmit in BAI2 format.
+   Transmission Methods: Information can be accessed and transmitted in two ways:
+       Web-based SinglePoint Portal: Reports can be manually downloaded or scheduled for export in PDF, CSV, Excel, and BAI2 formats.
+       Direct File Transmission: Files can be pushed directly to the State's servers. Supported direct transmission protocols include SFTP (SSH), FTP, HTTPS, FTPS (SSL), Connect:Direct (VPN), and AS2.
+
+ 7. [R278] Reporting Capabilities of Web-Based Lockbox Portal
+   Proposal Response: Not applicable. Lockbox portal reporting was not responded to.
+   SinglePoint Portal Reporting Capabilities: U.S. Bank's primary treasury management portal is SinglePoint, which offers:
+       24/7 access to previous-day and current-day reporting.
+       The ability to create, save, and share customized reports based on accounts, date ranges, transaction types (specific BAI codes), transaction amounts, or reference numbers.
+       Integrated reporting for check, ACH, and wire transactions (including summary and detail reports like ARP Summary, Daily Outstanding, Daily Paid, Recon Data, and Recon Outstanding).
+       Extended retention: Standard term is 60 days for previous-day reporting, with optional extensions of 3, 6, 12, or 24 months.
+
+ 8. [R295] New Services or Ideas to Enhance Lockbox Services
+   Proposal Response: Not applicable for physical lockboxes.
+   Related Cash Management Best Practices: To optimize overall collections, U.S. Bank recommends that the concentration bank provide automated electronic collection alternatives to streamline paper-heavy operations:
+       E-Lockbox ACHs to streamline electronic receivables.
+       VantagePoint centralizes exception management and automates cash application by centralizing incoming ACH payments.
+       Universal Payment Identification Codes (UPIC): A bank-neutral secure account identifier that allows the State to safely disclose a masked account number to payers for incoming ACH payments, avoiding fraud and maintaining portability if the State changes banks in the future.
+
+ 9. [R270] Check Processing for Deposit (Physical Deposit vs. ICLs)
+   Proposal Response: Under Lockbox Services, this is Not applicable.
+   General Check Deposits: U.S. Bank utilizes electronic check truncation under Check 21 Regulations, eliminating the need to physically deposit paper checks at a branch:
+       On-Site Electronic Deposit (RDC): Scanned locally using batch-feed or single-feed scanners and transmitted via secure SSL 128-bit encryption.
+       Image Cash Letter (ICL): MICR data and check images are captured through the State's own image capture solution and securely transmitted in standard X9.100-187 format.
+
+ 10. [R266] Controls for Accurate Processing per Customer Specifications
+   Proposal Response: Not applicable for Lockbox services.
+   Proposed Controls (General Banking/RDC):
+       Balance Batches module blocks submission of un-balanced check scans until the user validates the check images.
+       ACH Validation: Automatically validates files against duplicate transmissions within the prior 30 calendar days and matches control totals.
+       Dual System Administration: All changes to user access, entitlements, or limits on SinglePoint and Access Online require dual administrator approval by default.
+       Error Rate Verification: Maintains a strict manual review quality goal of no more than 0.75 errors per 1,000 exception items.
+
+ 11. [R292] eLockbox Services and Description
+   Proposal Response: eLockbox Services were not detailed in the questionnaire as Lockbox was marked "Not applicable".
+   Electronic Receivables Equivalent: U.S. Bank recommends that the concentration bank provide E-Lockbox ACHs as a cash management best practice, and proposes VantagePoint to capture and identify incoming electronic ACH receivables.
+
+ 12. [R261] Establishing Processing Procedures & Personnel Involved
+   Proposal Response: Not applicable. Lockbox setups were not completed.
+   General Banking/CPS Onboarding Process: Setting up procedures involves a collaborative, multi-phase methodology:
+       Discovery Phase: Conduct discovery meetings to evaluate workflows and cash flows.
+       Stakeholders Involved: The Treasury Management Sales Consultant (Dave Sullender), the Relationship Manager (Bobbi Michalowski), and a dedicated technical implementation coordinator from the File Management Services group. Under CPS, it also includes an Implementation Project Manager (Michael Bornhorst), Solutions Engineer (Traci Miner), and a Technology Consultant.
+
+ 13. [R285] Lockbox Operation Tour
+   Proposal Response: Not applicable. U.S. Bank did not propose for this component.
+
+ 14. [R289] Lockbox Card Payments & Proposed Merchant Processor
+   Proposal Response: Not applicable for lockbox.
+   Proposed Merchant Processor: U.S. Bank proposed to utilize its wholly owned payment acquiring subsidiary, Elavon Merchant Services (Elavon), which provides merchant payment processing and straight-through card processing.
+
+ 15. [R303] Initial and Ongoing Education and Training Plan
+   Lockbox Services: Not applicable.
+   Alternative Proposed Training Plans:
+       SinglePoint (General Banking): Instructor-led, online training sessions with hands-on emulation, complemented by step-by-step user guides and instructional videos. Ongoing weekly 60-minute training sessions are held on Tuesdays and Thursdays at 2:00 p.m. ET.
+       Access Online (Purchasing Cards): Flexible, role-based Web-Based Training (WBT) portal available 24/7 with interactive lessons and quizzes. Also offers live virtual classes multiple times a month and customizable PowerPoint templates for the State's internal end-user training.
+       ReliaCard (Stored Value): Onboarding Project Manager Abby Kutschied conducts web-based administrator training to walk the State through card funding, enrollments, reports, and permissions.
+
+ 16. [R262] Document Outlining Lockbox Processing Procedures
+   Proposal Response: Not applicable. Lockbox manuals were not provided.
+
+ 17. [R251] Proposed Lockbox Solution (Wholesale, Retail, Wholetail)
+   Proposal Response: Not applicable. U.S. Bank did not propose for this component.
+
+ 18. [R311] Disaster Recovery Employed in a Real Disaster
+   Proposal Response: While the proposal outlines extensive "all hazards" business recovery, power outage mitigation, and disaster response plans, the provided text passages of the proposal do not explicitly specify whether these procedures have ever been activated or employed for a real-world disaster.
+   Enterprise Preparedness Capabilities: Their plans are tested annually, and core processes utilize redundant primary data centers with three days of backup generation, geographically separate hot sites with near real-time data replication, and remote work recovery strategies.
+
+ 19. [R254] Unique Five-Digit Zip Code for Receipt of Lockbox Items
+   Proposal Response: Not applicable for lockbox.
+
+ 20. [R255] Accommodating State Preference to Use a Delaware P.O. Box
+   Proposal Response: Not applicable under Lockbox Services.
+   Card-Related P.O. Box Shipping: For Stored Value Cards (Component 4) and Purchasing Cards (Component 3), U.S. Bank can mail initial or replacement cards directly to a P.O. Box address via standard mail. (Expedited deliveries, however, cannot be sent to P.O. Box addresses).
+
+
+
+
+

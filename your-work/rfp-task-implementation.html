@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RFP Automation — Implementation Plan by Phase</title>
+<style>
+  :root {
+    --ground:#fdf6c7;
+    --surface:#fffdf8;
+    --surface-2:#f7ebff;
+    --ink:#24163d;
+    --ink-soft:#5f4b78;
+    --ink-faint:#8b74a8;
+    --rule:#e4d5f6;
+    --rule-soft:#f7ecff;
+    --accent:#6d28d9;
+    --accent-soft:#efe7ff;
+    --seal:#d4a017;
+    --seal-soft:#fff2b8;
+    --ok:#4c7a2e;
+    --ok-soft:#edf8e5;
+    --warn:#a15f16;
+    --warn-soft:#fdf0d7;
+    --crit:#b33a5f;
+    --crit-soft:#fde9ef;
+    --idle:#7a6a8c;
+    --idle-soft:#f2ebfa;
+    --serif:Georgia,"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Mono","Cascadia Code","SF Mono",Menlo,Consolas,monospace;
+    --spine:78ch;
+    --wide:1240px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:linear-gradient(135deg,var(--ground) 0%,var(--surface-2) 100%);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--wide);margin:0 auto;padding:0 24px 140px}
+  .spine{max-width:var(--spine)}
+  a{color:var(--accent)}
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+  .reveal.shown{opacity:1;transform:none}
+  .masthead{border-bottom:2px solid var(--ink);padding:36px 28px 24px;margin:24px 0 42px;border-radius:24px;background:linear-gradient(90deg, rgba(109,40,217,.10), rgba(212,160,23,.10));box-shadow:0 10px 30px rgba(36,22,61,.06)}
+  .eyebrow{font-family:var(--mono);font-size:.71rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  .masthead h1{font-family:var(--serif);font-size:clamp(2rem,4.7vw,3.1rem);line-height:1.08;font-weight:700;letter-spacing:-.02em;margin:0 0 16px;max-width:18ch;text-wrap:balance}
+  .standfirst{font-size:1.08rem;color:var(--ink-soft);max-width:72ch;margin:0 0 18px}
+  .colophon{display:flex;flex-wrap:wrap;gap:10px 26px;font-family:var(--mono);font-size:.75rem;color:var(--ink-faint);padding-top:12px;border-top:1px solid var(--rule-soft)}
+  .colophon b{color:var(--ink-soft);font-weight:600}
+  .toc{border:1px solid var(--rule);background:var(--surface);padding:18px 22px;margin:0 0 44px;box-shadow:0 10px 24px rgba(36,22,61,.06)}
+  .toc h3{margin:0 0 10px;font-size:.95rem}
+  .toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px}
+  .toc li{margin:0 0 6px;font-size:.9rem}
+  .toc a{color:var(--ink-soft);text-decoration:none}
+  .toc a:hover{color:var(--accent);text-decoration:underline}
+  section{margin:0 0 72px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
+  .sec-num{font-family:var(--mono);font-size:.74rem;color:var(--accent);letter-spacing:.08em;flex:none}
+  .sec-head h2{font-family:var(--serif);font-size:1.62rem;font-weight:700;letter-spacing:-.012em;margin:0;text-wrap:balance}
+  h3{font-size:1.04rem;font-weight:680;margin:24px 0 8px;letter-spacing:-.004em}
+  h4{font-size:.95rem;font-weight:650;margin:20px 0 6px;color:var(--ink-soft)}
+  p{margin:0 0 13px}
+  .lane{border:1px solid var(--rule);border-left:3px solid var(--accent);background:var(--surface);padding:16px 18px;margin:16px 0;box-shadow:0 10px 24px rgba(36,22,61,.06)}
+  .lane.tech{border-left-color:var(--seal)}
+  .lane-tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:8px}
+  .lane.tech .lane-tag{color:var(--seal)}
+  .lane p:last-child{margin-bottom:0}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:6px 0}
+  .tile{background:var(--surface);padding:16px 14px 14px;transition:background .2s}
+  .tile:hover{background:var(--surface-2)}
+  .tile .v{font-family:var(--serif);font-size:1.8rem;font-weight:700;line-height:1;letter-spacing:-.02em;display:block;margin-bottom:6px}
+  .tile .k{font-size:.78rem;color:var(--ink-soft);line-height:1.4;display:block}
+  .tile .k b{color:var(--ink);font-weight:620}
+  .v.acc{color:var(--accent)} .v.cri{color:var(--crit)} .v.sea{color:var(--seal)} .v.ok{color:var(--ok)}
+  .chip{font-family:var(--mono);font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;padding:2.5px 8px;border:1px solid currentColor;white-space:nowrap;display:inline-block}
+  .chip.ok{color:var(--ok);background:var(--ok-soft)}
+  .chip.warn{color:var(--warn);background:var(--warn-soft)}
+  .chip.crit{color:var(--crit);background:var(--crit-soft)}
+  .chip.acc{color:var(--accent);background:var(--accent-soft)}
+  .chip.sea{color:var(--seal);background:var(--seal-soft)}
+  .callout{border:1px solid var(--rule);border-top:3px solid var(--accent);background:var(--surface);padding:18px 20px;margin:18px 0;box-shadow:0 10px 24px rgba(36,22,61,.06)}
+  .callout.amber{border-top-color:var(--seal)}
+  .callout.good{border-top-color:var(--ok)}
+  .callout.crit{border-top-color:var(--crit)}
+  .callout h3{margin:0 0 8px;font-size:1.02rem}
+  .callout p{font-size:.94rem;color:var(--ink-soft);max-width:72ch}
+  .callout p strong{color:var(--ink)}
+  .phases{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .phase{display:grid;grid-template-columns:56px 1fr 190px;gap:18px;border:1px solid var(--rule);background:var(--surface);padding:14px 16px;border-left:3px solid var(--idle);transition:transform .18s,box-shadow .18s;box-shadow:0 10px 24px rgba(36,22,61,.06)}
+  .phase:hover{transform:translateX(3px)}
+  .phase.done{border-left-color:var(--ok)}
+  .phase.next{border-left-color:var(--seal)}
+  .phase.block{border-left-color:var(--crit)}
+  .phase.rule{border-left-color:var(--accent)}
+  .ph-id{font-family:var(--mono);font-size:1.05rem;font-weight:700;color:var(--ink-faint)}
+  .phase.done .ph-id{color:var(--ok)} .phase.next .ph-id{color:var(--seal)} .phase.block .ph-id{color:var(--crit)} .phase.rule .ph-id{color:var(--accent)}
+  .ph-body h3{margin:0 0 5px;font-size:1rem}
+  .ph-body p{margin:0;font-size:.9rem;color:var(--ink-soft);max-width:62ch}
+  .ph-meta{font-family:var(--mono);font-size:.75rem;color:var(--ink-soft)}
+  ul.tight{margin:8px 0 14px;padding-left:20px}
+  ul.tight li{margin:0 0 7px;font-size:.94rem;color:var(--ink-soft)}
+  ul.tight li strong{color:var(--ink)}
+  .diagram{background:var(--surface);border:1px solid var(--rule);padding:18px 18px 20px;margin:20px 0;overflow-x:auto;box-shadow:0 10px 24px rgba(36,22,61,.06)}
+  .diagram svg{max-width:100%;height:auto;display:block;margin:0 auto}
+  .note{border-left:2px solid var(--seal);background:var(--seal-soft);padding:13px 16px;font-size:.93rem;margin:16px 0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.9rem;background:var(--surface)}
+  th,td{border:1px solid var(--rule);padding:9px 11px;text-align:left;vertical-align:top;color:var(--ink-soft)}
+  th{background:var(--accent-soft);color:var(--ink);font-weight:650;font-size:.82rem}
+  td strong{color:var(--ink)}
+  .tbl-wrap{overflow-x:auto;margin:14px 0}
+  .fix{border:1px solid var(--rule);border-left:3px solid var(--crit);background:var(--surface);padding:14px 16px;margin:14px 0;box-shadow:0 10px 24px rgba(36,22,61,.06)}
+  .fix .fix-tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--crit);display:block;margin-bottom:7px}
+  .fix p{font-size:.93rem;color:var(--ink-soft);margin:0 0 9px}
+  .fix p:last-child{margin-bottom:0}
+  .fix p strong{color:var(--ink)}
+  .toggle{position:fixed;top:16px;right:16px;z-index:50;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;background:var(--surface);color:var(--ink-soft);border:1px solid var(--rule);padding:7px 12px;cursor:pointer}
+  .toggle:hover{border-color:var(--accent);color:var(--accent)}
+  @media (max-width:760px){
+    .phase{grid-template-columns:44px 1fr}.ph-meta{grid-column:1/-1}.toc ol{columns:1}
+  }
+</style>
+</head>
+<body>
+<button class="toggle" id="themeToggle" aria-label="Toggle colour theme">theme</button>
+<div class="wrap">
+<header class="masthead reveal">
+  <p class="eyebrow">Implementation Guide · Intern RFP Project · reviewed draft</p>
+  <h1>How each task is to be implemented phase by phase</h1>
+  <p class="standfirst">This page walks through the practical implementation of the internship work: what each task is meant to solve, how it is executed, what evidence is produced, and how the work connects to the larger product goal.</p>
+  <div class="colophon">
+    <span><b>Audience</b> founders, reviewers, and project stakeholders</span>
+    <span><b>Focus</b> implementation, evidence, and delivery</span>
+    <span><b>Mode</b> phase-based and task-driven</span>
+  </div>
+</header>
+
+<div class="callout good reveal">
+  <h3>Four things to settle before starting</h3>
+  <p>The rest of this page is the method. These four decide whether the output is usable at all: <strong>the decision rules that make an annotation row valid</strong> (<a href="#phase1">§04</a>), <strong>what counts as success when sourcing finds no pair</strong> (<a href="#phase2">§05</a>), <strong>the review pass that has to happen on day one or not at all</strong> (<a href="#phase5">§08</a>), and <strong>the day-by-day schedule with its checkpoints</strong> (<a href="#schedule">§09</a>). The failure modes behind each are in <a href="#review">§10</a>.</p>
+</div>
+
+<nav class="toc reveal">
+  <h3>What this page covers</h3>
+  <ol>
+    <li><a href="#problem">Problem statements that drive the work</a></li>
+    <li><a href="#principles">Implementation principles</a></li>
+    <li><a href="#phase0">Phase 0 — overall stack and tools</a></li>
+    <li><a href="#phase1">Phase 1 — expand the golden set</a></li>
+    <li><a href="#phase2">Phase 2 — source real RFP-proposal pairs</a></li>
+    <li><a href="#phase3">Phase 3 — questionnaire landscape</a></li>
+    <li><a href="#phase4">Phase 4 — competitor landscape</a></li>
+    <li><a href="#phase5">Phase 5 — explainer review</a></li>
+    <li><a href="#schedule">Schedule, checkpoints and escalation</a></li>
+    <li><a href="#review">Failure modes to plan against</a></li>
+  </ol>
+</nav>
+
+<section id="problem" class="reveal">
+  <div class="sec-head"><span class="sec-num">01</span><h2>The problem statements driving the implementation</h2></div>
+  <div class="lane">
+    <span class="lane-tag">Business problem</span>
+    <p>The core challenge is that procurement teams are drowning in repetitive, high-stakes document work. An incoming RFP may contain hundreds of requirements, many of which are already answered somewhere in a company’s previous work. But blindly reusing old content creates a serious risk: a proposal is a binding commercial document, and a confident but unsupported answer can become a real commitment.</p>
+  </div>
+  <div class="lane tech">
+    <span class="lane-tag">Technical problem</span>
+    <p>The system must not only retrieve relevant text, but also decide whether that text truly answers a requirement. Similarity alone is not enough. The project therefore focuses on evidence selection, safe refusal, citation verification, and human review for sensitive content.</p>
+  </div>
+  <h3>Where the numbers stand today</h3>
+  <div class="tiles">
+    <div class="tile"><span class="v acc">622</span><span class="k"><b>Requirements</b> in the reference RFP — 50 of them (8%) are covered by the golden set</span></div>
+    <div class="tile"><span class="v cri">12</span><span class="k"><b>Verified negatives.</b> The entire safety measurement rests on these twelve rows</span></div>
+    <div class="tile"><span class="v cri">1</span><span class="k"><b>Real pair</b> owned. Every finding the project has comes from it</span></div>
+    <div class="tile"><span class="v ok">0</span><span class="k"><b>Invalid citations</b> measured so far — an existing result to protect, not a target to reach</span></div>
+  </div>
+  <h3>What this work is meant to move</h3>
+  <div class="tiles">
+    <div class="tile"><span class="v sea">+60</span><span class="k"><b>New annotated rows</b> — 40 fair sample, 20 lockbox-biased</span></div>
+    <div class="tile"><span class="v sea">~3×</span><span class="k"><b>Target safety sample</b> — the number of verified negatives available to test refusal</span></div>
+    <div class="tile"><span class="v sea">25+</span><span class="k"><b>Sources checked</b> for real RFP-proposal pairs, dead ends included</span></div>
+    <div class="tile"><span class="v sea">2</span><span class="k"><b>Research memos</b> feeding an open product decision</span></div>
+  </div>
+  <div class="diagram">
+    <svg viewBox="0 0 760 260" role="img" aria-label="Problem flow from RFP complexity to safe answer generation">
+      <defs><marker id="ar1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent)" /></marker></defs>
+      <rect x="40" y="40" width="150" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="115" y="72" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="var(--ink)">Open RFP</text>
+      <text x="115" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="var(--ink-soft)">Long, dense, repetitive</text>
+      <line x1="190" y1="75" x2="250" y2="75" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar1)" />
+      <rect x="250" y="40" width="180" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="340" y="72" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="var(--ink)">Extract requirements</text>
+      <text x="340" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="var(--ink-soft)">Mine from prose</text>
+      <line x1="430" y1="75" x2="500" y2="75" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar1)" />
+      <rect x="500" y="40" width="220" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="610" y="72" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="var(--ink)">Find evidence or refuse</text>
+      <text x="610" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="var(--ink-soft)">Grounded answer or human route</text>
+      <rect x="250" y="160" width="220" height="60" rx="16" fill="var(--seal-soft)" stroke="var(--seal)" stroke-width="2" />
+      <text x="360" y="188" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="var(--ink)">Gap detection is the real risk</text>
+      <text x="360" y="208" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="var(--ink-soft)">Do not fabricate unsupported content</text>
+      <line x1="360" y1="110" x2="360" y2="150" stroke="var(--seal)" stroke-width="2" marker-end="url(#ar1)" />
+    </svg>
+  </div>
+</section>
+
+<section id="principles" class="reveal">
+  <div class="sec-head"><span class="sec-num">02</span><h2>Implementation principles</h2></div>
+  <p class="spine">These are standing rules that apply to every phase, not stages with a status. They are the house style: work that follows them is reviewable, and work that does not is unusable no matter how much of it there is.</p>
+  <div class="phases">
+    <div class="phase rule">
+      <div class="ph-id">R1</div>
+      <div class="ph-body"><h3>Evidence before assertions</h3><p>Every claim must be traceable to the actual document and page, not just a plausible answer. A self-report is a claim, not a verification — including my own.</p></div>
+      <div class="ph-meta">applies throughout</div>
+    </div>
+    <div class="phase rule">
+      <div class="ph-id">R2</div>
+      <div class="ph-body"><h3>Measure what matters</h3><p>Do not optimize a metric that cannot detect false answers. Before trusting a number, ask what would make it go down — a golden set with no verified negatives in it cannot fail.</p></div>
+      <div class="ph-meta">core evaluation rule</div>
+    </div>
+    <div class="phase rule">
+      <div class="ph-id">R3</div>
+      <div class="ph-body"><h3>Record reasoning</h3><p>Every judgment must include the reason behind it so others can review and challenge the conclusion. Reasoning that is not written down cannot be checked, and the row becomes unusable.</p></div>
+      <div class="ph-meta">makes work auditable</div>
+    </div>
+    <div class="phase rule">
+      <div class="ph-id">R4</div>
+      <div class="ph-body"><h3>Safe refusal is first-class</h3><p>The system should prefer “I cannot determine this from the available evidence” over an invented answer. The same standard applies to my own deliverables: “I don’t know, here is what I checked” is a complete answer.</p></div>
+      <div class="ph-meta">product safety principle</div>
+    </div>
+    <div class="phase rule">
+      <div class="ph-id">R5</div>
+      <div class="ph-body"><h3>A safety rule that over-fires is not safe</h3><p>Refusing everything protects nobody, because a tool that refuses half the time gets switched off. Never assess what a rule catches without also assessing what it breaks.</p></div>
+      <div class="ph-meta">counterweight to R4</div>
+    </div>
+  </div>
+</section>
+
+<section id="phase0" class="reveal">
+  <div class="sec-head"><span class="sec-num">03</span><h2>Phase 0 — Overall stack and tools required across the project</h2></div>
+  <div class="lane">
+    <span class="lane-tag">Foundation layer</span>
+    <p><strong><em>This phase is not a delivery task in itself</em></strong>, but it defines the operating system for every later phase. The work depends on a small and deliberately boring stack: <strong>Python</strong> (standard library only) for validation, <strong>JSONL</strong> for structured evidence rows, <strong>Markdown and HTML</strong> for documentation and presentation, and a <strong>PDF viewer</strong> for the source documents. Nothing here needs an account, an API key, a running server, or a network connection.</p>
+  </div>
+  <h3>Core tools and why they matter</h3>
+  <ul class="tight">
+    <li><strong>Python</strong> — runs the three scripts that ship with the pack: <code>verify_quotes.py</code> (daily self-check), <code>make_worklist.py</code> (already run), <code>extract_pages.py</code> (already run).</li>
+    <li><strong>JSONL</strong> — the row-level format for annotations: verdict, page, quote, reasoning. One object per line, so files diff and merge cleanly.</li>
+    <li><strong>Markdown / HTML</strong> — research memos, logs, and presentation-style deliverables.</li>
+    <li><strong>PDF viewer</strong> — the primary research instrument for Phase 1. Page numbers always mean the viewer’s page counter, never the number printed in the footer.</li>
+    <li><strong>Public-source research workflow</strong> — browser plus a disciplined log, for Phases 2 to 4.</li>
+  </ul>
+  <div class="callout">
+    <h3>Setup gate before Phase 1 begins</h3>
+    <p>Phase 1 cannot start until this command runs and reports <strong>41/41 verified</strong>:</p>
+    <p><code>python tools/verify_quotes.py --claims 02-evidence/example_annotations_C.jsonl</code></p>
+    <p>That single command re-checks 50 real annotations against 214 pages of PDF text. If it does not produce that output, the daily self-check in Phase 1 will not work either, and it is worth raising immediately rather than annotating blind.</p>
+  </div>
+  <div class="callout amber">
+    <h3><em>Key challenge this phase hits</em></h3>
+    <p><strong>Tooling fragmentation</strong> is a real risk in this kind of work. If the workflow is not standardized, evidence becomes hard to compare, review, and trust. This phase reduces that risk by creating a shared operating model for the entire project.</p>
+  </div>
+</section>
+
+<section id="phase1" class="reveal">
+  <div class="sec-head"><span class="sec-num">04</span><h2>Phase 1 — Expand the golden set</h2></div>
+  <div class="lane">
+    <span class="lane-tag">Objective</span>
+    <p>Build a stronger evaluation ruler by adding more hand-verified examples to the golden set. The value of this work is not annotation volume; it is increasing the number of verified true negatives that can test whether the system refuses appropriately. <strong>Target: 60 rows — 40 from the fair sample, 20 from the lockbox-biased sample.</strong></p>
+  </div>
+  <h3>Implementation points</h3>
+  <ul class="tight">
+    <li><strong>Step 1.</strong> Review the existing annotation examples and the task brief so the labeling style is consistent.</li>
+    <li><strong>Step 2.</strong> For each requirement, note what it actually asks and <strong>which service line it is scoped to</strong> — that scope decides the hardest calls.</li>
+    <li><strong>Step 3.</strong> Search the proposal, then decide <code>answered</code>, <code>partial</code>, or <code>none</code> by the decision rules below.</li>
+    <li><strong>Step 4.</strong> Capture a verbatim quote (25 characters minimum, pasted not retyped), the page number from the viewer’s counter, and a short reasoning note.</li>
+    <li><strong>Step 5.</strong> Keep the two worklists separate: one fair sample, one lockbox-biased set designed to stress the gap problem. Never report a combined rate.</li>
+    <li><strong>Step 6.</strong> Run the verification script daily to catch quote and page mismatches before they accumulate.</li>
+  </ul>
+
+  <h3>The decision rules — the part that makes a row valid</h3>
+  <p class="spine">These are the rules a human adjudicator already applied to resolve the disagreements in the existing 50 rows. Applying the same ones is what makes new rows mergeable with the old set; labelling by instinct instead produces 60 rows that cannot be combined with anything.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:20%">Rule</th><th style="width:44%">What it says</th><th style="width:36%">Why it is that strict</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>1 · Service line</strong></td>
+        <td>A requirement scoped to a service the vendor did not bid is <strong><code>none</code></strong>, even when the same capability is described elsewhere for a different service.</td>
+        <td>This exact substitution is the system’s dominant failure mode. If the golden set blesses it, we score the system for doing the thing we most need it not to do.</td>
+      </tr>
+      <tr>
+        <td><strong>1b · Headings</strong></td>
+        <td>A <em>differing section heading</em> is <strong>not</strong> a scope problem. Only the requirement’s own scope decides Rule 1.</td>
+        <td>RFP and proposal headings come from unrelated taxonomies and nearly always differ. A shipped rule that treated this as meaningful began refusing 18 of 38 answerable requirements.</td>
+      </tr>
+      <tr>
+        <td><strong>2 · Staleness</strong></td>
+        <td>Answered but out of date is still <strong><code>answered</code></strong> — old names, old figures, “available in the fall of 2018”.</td>
+        <td>We are measuring whether the library <em>contains</em> an answer, not whether it is publication-ready.</td>
+      </tr>
+      <tr>
+        <td><strong>3 · Exhibits</strong></td>
+        <td>An answer that exists only as a pointer to an exhibit not in the document is <strong><code>partial</code></strong>.</td>
+        <td>We measure what is findable in the text we actually have.</td>
+      </tr>
+      <tr>
+        <td><strong>4 · No rule fits</strong></td>
+        <td>Do not force a verdict. Record best judgement, set confidence <code>low</code>, explain the tension, and flag it.</td>
+        <td>The existing set has five such rows and each exposed a real definitional question about the product. A flagged ambiguity is a finding, not a failure.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="note"><strong><code>none</code> rows carry <code>page: 0</code> and an empty quote.</strong> You are asserting an absence, so there is nothing to quote — and the checker rejects a <code>none</code> that carries one. These are the most valuable rows in the set; state them plainly when they are true.</div>
+
+  <div class="fix">
+    <span class="fix-tag">Failure mode to avoid</span>
+    <p><strong>Resolving every hard call as <code>none</code> to feel safe.</strong> That produces a golden set which rewards a system for refusing everything, which is principle R5 broken from the annotation side. Be strict exactly where Rule 1 says to be strict, and honest everywhere else.</p>
+  </div>
+
+  <div class="callout crit">
+    <h3><em>Key challenge this phase hits</em></h3>
+    <p><strong>Ground-truth scarcity</strong> and <strong>annotation drift</strong> are the main risks here. Without enough verified negatives, the system can appear safe simply because the evaluation set contains too few true gaps.</p>
+    <ul class="tight">
+      <li><strong>Problem statement:</strong> the project needs reliable negatives, not just positive examples.</li>
+      <li><strong>Why it matters:</strong> it creates the evidence needed to make the safety metric meaningful.</li>
+      <li><strong>Why a human must do it:</strong> a golden set produced by the system under test measures the system against itself and scores near-perfect while proving nothing.</li>
+    </ul>
+  </div>
+  <div class="diagram">
+    <svg viewBox="0 0 760 250" role="img" aria-label="Golden set annotation flow">
+      <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent)" /></marker></defs>
+      <rect x="40" y="70" width="150" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="115" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Read requirement</text>
+      <text x="115" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">note its service line</text>
+      <line x1="190" y1="105" x2="250" y2="105" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar2)" />
+      <rect x="250" y="70" width="160" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="330" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Search proposal</text>
+      <text x="330" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">check the heading of each hit</text>
+      <line x1="410" y1="105" x2="470" y2="105" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar2)" />
+      <rect x="470" y="70" width="170" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="555" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Apply the rules</text>
+      <text x="555" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">label + quote + reasoning</text>
+      <line x1="555" y1="140" x2="555" y2="180" stroke="var(--seal)" stroke-width="2" marker-end="url(#ar2)" />
+      <rect x="470" y="180" width="170" height="50" rx="16" fill="var(--seal-soft)" stroke="var(--seal)" stroke-width="2" />
+      <text x="555" y="203" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="var(--ink)">Verify page and quote</text>
+      <text x="555" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">daily, not at the end</text>
+    </svg>
+  </div>
+  <h3>Definition of done</h3>
+  <ul class="tight">
+    <li>All 40 rows of list A and all 20 of list B carry a verdict, confidence and reasoning.</li>
+    <li><code>verify_quotes.py</code> reports <strong>zero <code>not_found</code></strong> and <strong>zero <code>empty_quote</code></strong> on both files.</li>
+    <li>Every <code>none</code> row has <code>page: 0</code> and an empty quote.</li>
+    <li>A summary written per the template: verdict counts <strong>per list, reported separately</strong>, low-confidence count, rows wanting a second opinion, and any traps not already documented in the brief.</li>
+  </ul>
+  <div class="note">This phase is fundamentally about creating a trustworthy ruler before using it to score the system.</div>
+</section>
+
+<section id="phase2" class="reveal">
+  <div class="sec-head"><span class="sec-num">05</span><h2>Phase 2 — Source real RFP-proposal pairs</h2></div>
+  <div class="lane">
+    <span class="lane-tag">Objective</span>
+    <p>Find more examples of a real RFP and a real proposal submitted in response to it. This is the most valuable external expansion because the current system is anchored to a single real document pair.</p>
+  </div>
+
+  <div class="callout amber">
+    <h3>This phase may not find a pair, and that is a planned outcome</h3>
+    <p>Genuine submitted proposals are scarce <em>by their nature</em> — commercially sensitive, rarely published, hard to obtain. A prior search across banking and finance produced exactly one. <strong>Success here is tiered, and the lower tiers are real deliverables, not consolation prizes.</strong> What would make this phase fail is a week of searching that produces nothing another person can read.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:10%">Tier</th><th style="width:45%">What was found</th><th style="width:45%">Why it counts</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A</strong></td><td>A genuine submitted proposal <em>and</em> the RFP it responds to</td><td>The goal. Even one roughly doubles the project’s evidence base.</td></tr>
+      <tr><td><strong>B</strong></td><td>A genuine submitted proposal, RFP not findable</td><td>Still usable as knowledge-base material.</td></tr>
+      <tr><td><strong>C</strong></td><td>A <em>source</em> that publishes received proposals — a portal, agency or records archive — even with no pair extracted yet</td><td><strong>Often worth more than a single document.</strong> A repeatable source yields many pairs; one lucky find yields one.</td></tr>
+      <tr><td><strong>D</strong></td><td>A documented list of places that do <em>not</em> work, and why</td><td>Stops the next person spending a week rediscovering it. A specific negative is a finding.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Implementation points</h3>
+  <ul class="tight">
+    <li><strong>Step 1.</strong> Target <strong>publication habits, not documents.</strong> The one pair we own exists because Delaware proactively publishes the proposals it receives. The highest-value find is another agency with that habit, because it yields many pairs rather than one.</li>
+    <li><strong>Step 2.</strong> Work the <strong>reverse direction</strong>: proposals are rare and RFPs are everywhere, so start from a proposal and use the solicitation number printed in its first pages to find the matching RFP. Starting from an interesting RFP and hoping its proposals exist is the slow direction.</li>
+    <li><strong>Step 3.</strong> Verify whether each candidate is truly a submitted proposal rather than a template, brochure, or sample response — vendor voice, named buyer, specific solicitation number, answers in order.</li>
+    <li><strong>Step 4.</strong> Confirm the file is what it claims: a real proposal is megabytes, not kilobytes. Some government servers return an HTML block page saved under a <code>.pdf</code> name.</li>
+    <li><strong>Step 5.</strong> Record the RFP identifier, vendor, buyer, page count, and classify by the tier table above.</li>
+    <li><strong>Step 6.</strong> Log every source checked <em>as you go</em>, dead ends included, specifically enough that a reviewer can rely on the negative instead of repeating it. “Publishes RFPs and award notices but no received proposals; checked 12 solicitations across 2023–2025” is a conclusion. “Nothing there” is not.</li>
+  </ul>
+  <div class="callout">
+    <h3><em>Key challenge this phase hits</em></h3>
+    <p><strong>Data access and trust</strong> are the main obstacles. Real proposals are commercially sensitive, and public access is inconsistent, so success depends on finding publication habits rather than chasing one-off documents.</p>
+    <ul class="tight">
+      <li><strong>Problem statement:</strong> the project needs realistic evaluation examples, but real pairs are hard to procure.</li>
+      <li><strong>Why it matters:</strong> this phase determines whether the system can be evaluated on genuine RFP-response behavior, or only on one document.</li>
+      <li><strong>Boundaries:</strong> public and freely accessible documents only — no sign-ups, payments, records requests, or misrepresentation to obtain a file.</li>
+    </ul>
+  </div>
+  <div class="diagram">
+    <svg viewBox="0 0 760 260" role="img" aria-label="Source pair discovery flow">
+      <defs><marker id="ar3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent)" /></marker></defs>
+      <rect x="40" y="70" width="160" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="120" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Find a publisher</text>
+      <text x="120" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">an agency, not a file</text>
+      <line x1="200" y1="105" x2="260" y2="105" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar3)" />
+      <rect x="260" y="70" width="180" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="350" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Validate proposal</text>
+      <text x="350" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">genuine, not a template</text>
+      <line x1="440" y1="105" x2="500" y2="105" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar3)" />
+      <rect x="500" y="70" width="220" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="610" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Record and classify</text>
+      <text x="610" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">log dead ends too</text>
+      <line x1="610" y1="140" x2="610" y2="180" stroke="var(--seal)" stroke-width="2" marker-end="url(#ar3)" />
+      <rect x="470" y="180" width="250" height="50" rx="16" fill="var(--seal-soft)" stroke="var(--seal)" stroke-width="2" />
+      <text x="595" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="var(--ink)">Tier A pair / B proposal / C source / D negative</text>
+    </svg>
+  </div>
+</section>
+
+<section id="phase3" class="reveal">
+  <div class="sec-head"><span class="sec-num">06</span><h2>Phase 3 — Questionnaire landscape</h2></div>
+  <div class="lane">
+    <span class="lane-tag">Objective</span>
+    <p>Investigate whether the product should expand from RFPs into the question-driven world of questionnaires such as SIG, CAIQ, and DDQ. This is a strategic evaluation rather than a drafting task, and it feeds a decision that is genuinely open.</p>
+  </div>
+  <h3>Implementation points</h3>
+  <ul class="tight">
+    <li><strong>Step 1.</strong> Collect real examples of common questionnaires and observe their structure, format, and question style — question counts and quoted samples, not descriptions.</li>
+    <li><strong>Step 2.</strong> Compare them to RFPs on stated dimensions: are questions pre-listed or buried in prose? Are answers free text or constrained? Does the output shape match what our system drafts?</li>
+    <li><strong>Step 3. <em>The decisive question.</em></strong> Determine whether <strong>completed</strong> questionnaires — real answers from real companies — are obtainable, or whether only <strong>blank templates</strong> are. Only the completed ones are a knowledge base.</li>
+    <li><strong>Step 4.</strong> Evaluate whether that data could support a golden set <em>with verified gaps in it</em>. A curated answer set with no true negatives is answerable by construction and would score near-perfect while measuring nothing.</li>
+    <li><strong>Step 5.</strong> Conclude whether the pivot argument holds — including the outcome where the honest answer undercuts it.</li>
+  </ul>
+  <div class="fix">
+    <span class="fix-tag">Research discipline</span>
+    <p><strong>Do not ask leading questions of the evidence.</strong> “Are questionnaires simpler and easier to ground?” presupposes its answer; “what is the question format, and is completed data obtainable?” does not. The first version finds support for a pivot whether or not one is warranted.</p>
+    <p>Most first-page results will be <strong>marketing</strong> from companies selling questionnaire-automation software. Their figures are sales material until independently sourced — use them as leads, label them as vendor claims, and find the practitioner’s version.</p>
+  </div>
+  <div class="callout">
+    <h3><em>Key challenge this phase hits</em></h3>
+    <p><strong>Market fit uncertainty</strong> is the central challenge. The question is whether the market offers enough completed, grounded questionnaire data to create a meaningful benchmark — otherwise the product argument becomes much weaker.</p>
+    <ul class="tight">
+      <li><strong>Problem statement:</strong> the product may need to stay focused on RFPs if completed questionnaire data is as scarce as real proposals.</li>
+      <li><strong>Why it matters:</strong> this phase informs whether the roadmap should expand or stay narrow.</li>
+    </ul>
+  </div>
+  <div class="diagram">
+    <svg viewBox="0 0 760 250" role="img" aria-label="Questionnaire research flow">
+      <defs><marker id="ar4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent)" /></marker></defs>
+      <rect x="40" y="70" width="160" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="120" y="105" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Collect examples</text>
+      <line x1="200" y1="105" x2="260" y2="105" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar4)" />
+      <rect x="260" y="70" width="180" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="350" y="105" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Compare formats</text>
+      <line x1="440" y1="105" x2="500" y2="105" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar4)" />
+      <rect x="500" y="70" width="220" height="70" rx="16" fill="var(--seal-soft)" stroke="var(--seal)" stroke-width="2" />
+      <text x="610" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Is completed data real?</text>
+      <text x="610" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">the decisive question</text>
+    </svg>
+  </div>
+</section>
+
+<section id="phase4" class="reveal">
+  <div class="sec-head"><span class="sec-num">07</span><h2>Phase 4 — Competitor landscape</h2></div>
+  <div class="lane">
+    <span class="lane-tag">Objective</span>
+    <p>Understand what competitors already do, what they claim, and most importantly what they do not appear to solve. This phase aims to identify whether there is a genuine market gap around safe refusal and evidence-led drafting.</p>
+  </div>
+  <h3>Implementation points</h3>
+  <ul class="tight">
+    <li><strong>Step 1.</strong> Catalog prominent RFP-response tools and AI-native providers.</li>
+    <li><strong>Step 2.</strong> Extract what each claims about retrieval, answer generation, citations, and human review — quoting the actual claim.</li>
+    <li><strong>Step 3.</strong> Compare their positioning to the project’s central differentiator: controlled gap detection and safe refusal.</li>
+    <li><strong>Step 4.</strong> Establish whether anyone <strong>publishes measurements</strong> — accuracy, refusal rates, citation validity — or whether the whole category is unquantified claims.</li>
+    <li><strong>Step 5.</strong> Establish whether anyone does <strong>requirement mining from raw prose</strong>, or whether every tool assumes the user supplies a clean question list. Either answer is decision-relevant.</li>
+    <li><strong>Step 6.</strong> Translate the research into a sharp product thesis rather than a generic market summary.</li>
+  </ul>
+  <div class="fix">
+    <span class="fix-tag">Reporting discipline</span>
+    <p><strong>Keep “X says it does this” and “X does this” visibly separate throughout.</strong> A product page supports the first and almost never the second. Do not assess a competitor’s quality — you have not used the product. Report what they claim and, more usefully, <strong>what they are silent about</strong>: a page that discusses speed and content libraries at length and never mentions accuracy, citations or review is telling you what its buyers are not asking for.</p>
+  </div>
+  <div class="callout crit">
+    <h3><em>Key challenge this phase hits</em></h3>
+    <p><strong>Positioning and differentiation</strong> are the real challenge. Many vendors talk about answer libraries and speed, but far fewer treat <em>gap detection, refusal behavior, and traceability</em> as core product capabilities.</p>
+    <ul class="tight">
+      <li><strong>Problem statement:</strong> the product needs a sharper thesis than "faster drafting."</li>
+      <li><strong>Why it matters:</strong> this phase shapes the narrative for why the solution is defensible.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="phase5" class="reveal">
+  <div class="sec-head"><span class="sec-num">08</span><h2>Phase 5 — Explainer review</h2></div>
+  <div class="lane">
+    <span class="lane-tag">Objective</span>
+    <p>Review the project explanation from the perspective of a new teammate or stakeholder. The purpose is not to find typos, but to identify where the story is confusing, incomplete, or overly technical.</p>
+  </div>
+
+  <div class="callout crit">
+    <h3>Pass 1 is time-critical and cannot be rescheduled</h3>
+    <p>This phase is <strong>two passes, not one</strong>, and the first one has to happen <strong>immediately</strong> — while the explainer is still unfamiliar.</p>
+    <p><strong>Pass 1 (now):</strong> read the explainer and keep a running note of every point of confusion, re-read, or unknown term. Raw, unedited, in reading order. Ten minutes of work.</p>
+    <p><strong>Pass 2 (at the end):</strong> re-read knowing the project, and assess accuracy, gaps, structure and diagrams.</p>
+    <p><strong>Why the order matters:</strong> once you understand the project you can no longer see what was confusing about it — you read straight past the gap. This is the only deliverable in the whole plan that becomes <em>impossible</em> rather than merely late. If the explainer has already been read once, write down whatever confusion is still remembered, today, and mark it as reconstructed.</p>
+  </div>
+
+  <h3>Implementation points</h3>
+  <ul class="tight">
+    <li><strong>Step 1.</strong> Pass 1 — capture first-read confusion as it happens, before looking anything up.</li>
+    <li><strong>Step 2.</strong> Pass 2 — check the explainer’s claims against the evidence documents. <strong>Any number that contradicts them is a defect, not a suggestion</strong>, and gets reported separately and first.</li>
+    <li><strong>Step 3.</strong> Note where the problem, workflow, or decision logic becomes unclear, and where definitions arrive later than the terms they define.</li>
+    <li><strong>Step 4.</strong> Assess whether the diagrams carry meaning or decorate — a diagram that needs the surrounding text to explain it is not working.</li>
+    <li><strong>Step 5.</strong> Review the intern pack itself: was the reading order right, were the briefs specific enough, and <strong>what had to be asked of a person that should have been written down?</strong> Each of those is a defect in the pack.</li>
+    <li><strong>Step 6.</strong> Produce a memo: pass 1 notes verbatim, pass 2 findings grouped, accuracy defects first, then the top five changes ranked.</li>
+  </ul>
+  <div class="note">Specific beats polite. “Section 4 lost me at the second paragraph — I did not know what ‘grounding’ meant and it was not defined until section 7” is worth more than three paragraphs of balanced assessment.</div>
+  <div class="diagram">
+    <svg viewBox="0 0 760 220" role="img" aria-label="Explainer review loop">
+      <defs><marker id="ar5" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent)" /></marker></defs>
+      <rect x="40" y="70" width="160" height="70" rx="16" fill="var(--seal-soft)" stroke="var(--seal)" stroke-width="2" />
+      <text x="120" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Pass 1 — day one</text>
+      <text x="120" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">raw confusion notes</text>
+      <line x1="200" y1="105" x2="260" y2="105" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar5)" />
+      <rect x="260" y="70" width="180" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="350" y="97" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Pass 2 — at the end</text>
+      <text x="350" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="var(--ink-soft)">accuracy and gaps</text>
+      <line x1="440" y1="105" x2="500" y2="105" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar5)" />
+      <rect x="500" y="70" width="220" height="70" rx="16" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" />
+      <text x="610" y="105" text-anchor="middle" font-family="Georgia, serif" font-size="17" fill="var(--ink)">Ranked recommendations</text>
+    </svg>
+  </div>
+</section>
+
+<section id="schedule" class="reveal">
+  <div class="sec-head"><span class="sec-num">09</span><h2>Schedule, checkpoints and escalation</h2></div>
+  <p class="spine">A plan needs quantities and dates, not only a method. This section is what turns the phases above into something whose progress can be checked mid-week rather than judged at the end.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:16%">Days</th><th style="width:40%">Work</th><th style="width:44%">Checkpoint</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1</strong></td><td>Orientation reading; setup gate; <strong>Phase 5 pass 1</strong></td><td>Verifier prints 41/41. Pass 1 notes exist.</td></tr>
+      <tr><td><strong>2</strong></td><td>Phase 1 — first <strong>5 rows only</strong>, then stop</td><td><strong>Hard gate:</strong> run the verifier and read every result before annotating a sixth row.</td></tr>
+      <tr><td><strong>3–5</strong></td><td>Phase 1 — approximately <strong>12 rows/day</strong></td><td>Verifier clean at end of each day. Rule-4 flags logged as they arise.</td></tr>
+      <tr><td><strong>6–7</strong></td><td>Phase 1 — finish 60 rows; write the summary</td><td>Zero <code>not_found</code>. Counts reported <strong>per list, separately</strong>.</td></tr>
+      <tr><td><strong>8–10</strong></td><td>Phase 2 — sourcing</td><td><strong>End of day 9:</strong> if nothing in tiers A–C, raise it rather than continue the same approach.</td></tr>
+      <tr><td><strong>11–12</strong></td><td>Phase 3 or Phase 4, whichever looks more useful by then</td><td>Memo drafted with sources cited as collected, not reconstructed.</td></tr>
+      <tr><td><strong>13–14</strong></td><td>Phase 5 pass 2; finish outstanding write-ups</td><td>All deliverables reviewable without asking the author questions.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout amber">
+    <h3>Escalate — do not absorb</h3>
+    <ul class="tight">
+      <li>Stuck more than <strong>half a day</strong> on the same thing.</li>
+      <li>A single annotation row eating more than <strong>20 minutes</strong> — mark it <code>low</code>, log why, move on.</li>
+      <li><strong>Two days into Phase 2</strong> with nothing in tiers A–C.</li>
+      <li>A decision rule does not cover a case that keeps recurring — that means the rule is incomplete, which is a finding we want, not a personal gap.</li>
+      <li>Anything in the pack appears wrong. Write it down either way; never silently correct it.</li>
+    </ul>
+  </div>
+  <h3>Delivery shape and success criteria</h3>
+  <ul class="tight">
+    <li><strong>Annotated evidence rows</strong> with verdicts, quotes, pages, and reasoning — 60 rows across two lists kept separate.</li>
+    <li><strong>Source-candidate log</strong> covering 25 or more sources, successful and failed alike, plus a findings memo built around which sources publish received proposals.</li>
+    <li><strong>Research memos</strong> on questionnaire data availability and competitor positioning, with facts and interpretation in separate sections.</li>
+    <li><strong>A daily log and a running questions list</strong>, started on day one.</li>
+  </ul>
+  <div class="callout good">
+    <h3>Success definition</h3>
+    <p>The work is successful when each phase produces something that another person can inspect, trust, and build upon without needing to reconstruct the reasoning from scratch. Every deliverable states what was measured, on what data, at what sample size — and says plainly what could not be determined.</p>
+  </div>
+</section>
+
+<section id="review" class="reveal">
+  <div class="sec-head"><span class="sec-num">10</span><h2>Failure modes to plan against</h2></div>
+  <p class="spine">Four ways this work can be done diligently and still produce nothing usable. Each one is cheap to avoid at the start and expensive to repair at the end.</p>
+
+  <h3>1 · Sixty rows that cannot be merged</h3>
+  <p class="spine">The existing 50 golden-set rows were adjudicated by the four decision rules in <a href="#phase1">§04</a>. New rows labelled by instinct instead — however carefully — describe a different standard, so they cannot be combined with the old ones and cannot be scored together. The work would be real and the output unusable. <strong>Read the rules before the first row, not after the twentieth.</strong></p>
+
+  <h3>2 · A successful search reported as a failure</h3>
+  <p class="spine">Genuine submitted proposals are scarce by nature; a thorough search can legitimately end with no pair. Without the tier model in <a href="#phase2">§05</a> stated up front, that outcome reads as nothing achieved — when a documented map of which sources publish received proposals is a reusable asset the project does not currently have. <strong>Decide what counts as success before searching, or the result gets judged by the wrong standard.</strong></p>
+
+  <h3>3 · A deliverable that expires</h3>
+  <p class="spine">The first-read review in <a href="#phase5">§08</a> is the only item here that becomes <em>impossible</em> rather than late. Once the project is understood, its explanation stops being confusing — you read straight past the gap that a newcomer would fall into. Everything else in this plan can slip a day. This cannot.</p>
+
+  <h3>4 · Evidence gathered to confirm what was expected</h3>
+  <ul class="tight">
+    <li><strong>Leading questions.</strong> “Are questionnaires simpler and easier to ground?” presupposes its answer and will find support for a pivot whether or not one is warranted. Ask what the format is and whether completed data exists.</li>
+    <li><strong>Vendor claims read as facts.</strong> A product page supports “X says it does this”, almost never “X does this”. Keep the two visibly separate.</li>
+    <li><strong>Existing results read as targets.</strong> The zero invalid citations already measured is a property to avoid breaking, not a goal to reach — treating it as a goal hides that it is already true and could regress.</li>
+    <li><strong>Over-correcting on safety.</strong> Principle R5 exists because refusing whenever unsure is not caution, it is a different failure. On this project a safety rule written that way rejected 18 of 38 answerable requirements before anyone noticed.</li>
+  </ul>
+
+  <div class="callout good">
+    <h3>The three ideas worth carrying through every phase</h3>
+    <p><strong>Similarity cannot establish answerhood</strong> — text can be densely about a topic and still answer nothing, which is why a human reading the document is the only reliable source of ground truth. <strong>Safe refusal is the product</strong>, not a feature attached to it; everything measured here exists to test that one property. And <strong>a metric with no way to fail is not a measurement</strong> — which is why the verified negatives, the fair-versus-biased worklist split, and the documented dead ends all matter more than they look.</p>
+  </div>
+</section>
+</div>
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.classList.add('shown');
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+  const toggle = document.getElementById('themeToggle');
+  let dark = false;
+  const DARK = {
+    '--ground':'#0d1b2e','--surface':'#14253d','--surface-2':'#20324d','--ink':'#eef4ff',
+    '--ink-soft':'#b8c8e0','--ink-faint':'#8ea3bf','--rule':'#2b4160','--rule-soft':'#1c2d44',
+    '--accent':'#9b8cff','--accent-soft':'#2c2650','--seal':'#f2c94c','--seal-soft':'#3d2d12',
+    '--ok':'#7fe0a0','--ok-soft':'#1f3a2b','--warn':'#f0b35b','--warn-soft':'#3b2a12',
+    '--crit':'#ff7b9a','--crit-soft':'#3f2331','--idle':'#8aa0bc','--idle-soft':'#253347'
+  };
+  toggle?.addEventListener('click', () => {
+    dark = !dark;
+    const root = document.documentElement;
+    if (dark) {
+      Object.entries(DARK).forEach(([k, v]) => root.style.setProperty(k, v));
+    } else {
+      Object.keys(DARK).forEach((k) => root.style.removeProperty(k));
+    }
+  });
+</script>
+</body>
+</html>

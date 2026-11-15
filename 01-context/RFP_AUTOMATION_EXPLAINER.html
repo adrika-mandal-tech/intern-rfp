@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RFP Automation — What We Built and Why</title>
+<style>
+  :root {
+    --ground:#F4F6F5; --surface:#FFFFFF; --surface-2:#EBEEEC;
+    --ink:#161D1F; --ink-soft:#4A575A; --ink-faint:#78868A;
+    --rule:#D3DAD7; --rule-soft:#E3E8E5;
+    --accent:#0F5257; --accent-soft:#DDEAE9;
+    --seal:#B0752A; --seal-soft:#F5E8D4;
+    --ok:#2E6F4E; --ok-soft:#DCEBE2;
+    --warn:#9A6316; --warn-soft:#F6E9D3;
+    --crit:#9C3328; --crit-soft:#F6DFDB;
+    --idle:#5A6570; --idle-soft:#E5E8EA;
+    --serif:Georgia,"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Mono","Cascadia Code","SF Mono",Menlo,Consolas,monospace;
+    --spine:72ch; --wide:1140px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#11151A; --surface:#171C22; --surface-2:#1E252C;
+      --ink:#E6ECEA; --ink-soft:#A6B3B4; --ink-faint:#78888B;
+      --rule:#2C353D; --rule-soft:#232B32;
+      --accent:#5FBDB0; --accent-soft:#16302F;
+      --seal:#D9A05B; --seal-soft:#332613;
+      --ok:#6BBF8E; --ok-soft:#162A1F;
+      --warn:#D6A254; --warn-soft:#2E2413;
+      --crit:#E08579; --crit-soft:#331915;
+      --idle:#8A97A2; --idle-soft:#212830;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#11151A; --surface:#171C22; --surface-2:#1E252C;
+    --ink:#E6ECEA; --ink-soft:#A6B3B4; --ink-faint:#78888B;
+    --rule:#2C353D; --rule-soft:#232B32;
+    --accent:#5FBDB0; --accent-soft:#16302F;
+    --seal:#D9A05B; --seal-soft:#332613;
+    --ok:#6BBF8E; --ok-soft:#162A1F;
+    --warn:#D6A254; --warn-soft:#2E2413;
+    --crit:#E08579; --crit-soft:#331915;
+    --idle:#8A97A2; --idle-soft:#212830;
+  }
+  :root[data-theme="light"]{
+    --ground:#F4F6F5; --surface:#FFFFFF; --surface-2:#EBEEEC;
+    --ink:#161D1F; --ink-soft:#4A575A; --ink-faint:#78868A;
+    --rule:#D3DAD7; --rule-soft:#E3E8E5;
+    --accent:#0F5257; --accent-soft:#DDEAE9;
+    --seal:#B0752A; --seal-soft:#F5E8D4;
+    --ok:#2E6F4E; --ok-soft:#DCEBE2;
+    --warn:#9A6316; --warn-soft:#F6E9D3;
+    --crit:#9C3328; --crit-soft:#F6DFDB;
+    --idle:#5A6570; --idle-soft:#E5E8EA;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:16.5px; line-height:1.68;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--wide); margin:0 auto; padding:0 24px 140px}
+  .spine{max-width:var(--spine)}
+  code,.mono{font-family:var(--mono); font-size:.87em}
+  code{background:var(--surface-2); border:1px solid var(--rule-soft); border-radius:3px; padding:.08em .34em; color:var(--ink)}
+
+  /* ── reveal-on-scroll ─────────────────────────── */
+  .reveal{opacity:0; transform:translateY(14px); transition:opacity .55s ease, transform .55s ease}
+  .reveal.shown{opacity:1; transform:none}
+
+  /* ── masthead ─────────────────────────────────── */
+  .masthead{border-bottom:2px solid var(--ink); padding:60px 0 24px; margin-bottom:42px}
+  .eyebrow{font-family:var(--mono); font-size:.71rem; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin:0 0 18px}
+  .masthead h1{font-family:var(--serif); font-size:clamp(2.1rem,5.2vw,3.3rem); line-height:1.06; font-weight:700; letter-spacing:-.02em; margin:0 0 18px; max-width:20ch; text-wrap:balance}
+  .standfirst{font-size:1.11rem; color:var(--ink-soft); max-width:64ch; margin:0 0 24px}
+  .colophon{display:flex; flex-wrap:wrap; gap:10px 26px; font-family:var(--mono); font-size:.75rem; color:var(--ink-faint); padding-top:16px; border-top:1px solid var(--rule-soft)}
+  .colophon b{color:var(--ink-soft); font-weight:600}
+
+  /* ── sections ─────────────────────────────────── */
+  section{margin:0 0 72px}
+  .sec-head{display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--rule); padding-bottom:10px; margin-bottom:26px}
+  .sec-num{font-family:var(--mono); font-size:.74rem; color:var(--accent); letter-spacing:.08em; flex:none}
+  .sec-head h2{font-family:var(--serif); font-size:1.68rem; font-weight:700; letter-spacing:-.012em; margin:0; text-wrap:balance}
+  h3{font-size:1.06rem; font-weight:680; margin:32px 0 8px; letter-spacing:-.004em}
+  h4{font-size:.95rem; font-weight:650; margin:22px 0 6px; color:var(--ink-soft)}
+  p{margin:0 0 14px}
+  .spine p,.spine li{max-width:var(--spine)}
+  .lede{font-size:1.04rem; color:var(--ink-soft)}
+
+  /* ── dual lane: plain vs technical ────────────── */
+  .lane{border:1px solid var(--rule); border-left:3px solid var(--accent); background:var(--surface); padding:16px 20px; margin:16px 0}
+  .lane.tech{border-left-color:var(--seal)}
+  .lane-tag{font-family:var(--mono); font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:8px}
+  .lane.tech .lane-tag{color:var(--seal)}
+  .lane p:last-child{margin-bottom:0}
+
+  /* ── stat tiles ───────────────────────────────── */
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); margin:6px 0}
+  .tile{background:var(--surface); padding:18px 16px 16px; transition:background .2s}
+  .tile:hover{background:var(--surface-2)}
+  .tile .v{font-family:var(--serif); font-size:1.9rem; font-weight:700; line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums; display:block; margin-bottom:7px}
+  .tile .k{font-size:.79rem; color:var(--ink-soft); line-height:1.42; display:block}
+  .tile .k b{color:var(--ink); font-weight:620}
+  .v.acc{color:var(--accent)} .v.cri{color:var(--crit)} .v.sea{color:var(--seal)} .v.ok{color:var(--ok)}
+
+  /* ── chips ────────────────────────────────────── */
+  .chip{font-family:var(--mono); font-size:.67rem; letter-spacing:.07em; text-transform:uppercase; padding:2.5px 8px; border:1px solid currentColor; white-space:nowrap; display:inline-block}
+  .chip.ok{color:var(--ok); background:var(--ok-soft)}
+  .chip.warn{color:var(--warn); background:var(--warn-soft)}
+  .chip.crit{color:var(--crit); background:var(--crit-soft)}
+  .chip.acc{color:var(--accent); background:var(--accent-soft)}
+  .chip.sea{color:var(--seal); background:var(--seal-soft)}
+  .chip.idle{color:var(--idle); background:var(--idle-soft)}
+
+  /* ── callouts ─────────────────────────────────── */
+  .callout{border:1px solid var(--rule); border-top:3px solid var(--crit); background:var(--surface); padding:20px 22px; margin:20px 0}
+  .callout.amber{border-top-color:var(--seal)}
+  .callout.good{border-top-color:var(--ok)}
+  .callout.acc{border-top-color:var(--accent)}
+  .callout h3{margin:0 0 10px; font-size:1.07rem}
+  .callout p{font-size:.95rem; color:var(--ink-soft); max-width:72ch}
+  .callout p strong{color:var(--ink)}
+  .callout p:last-child{margin-bottom:0}
+
+  /* ── quote / example ──────────────────────────── */
+  .example{background:var(--surface-2); border-left:2px solid var(--seal); padding:12px 16px; margin:14px 0; font-size:.93rem}
+  .example .label{font-family:var(--mono); font-size:.66rem; letter-spacing:.09em; text-transform:uppercase; color:var(--seal); display:block; margin-bottom:6px}
+  .example em{color:var(--ink)}
+
+  /* ── tables ───────────────────────────────────── */
+  .scroll{overflow-x:auto; border:1px solid var(--rule); background:var(--surface); margin:16px 0}
+  table{border-collapse:collapse; width:100%; font-size:.9rem; min-width:520px}
+  th,td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--rule-soft); vertical-align:top}
+  thead th{font-family:var(--mono); font-size:.69rem; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-faint); border-bottom:1px solid var(--rule); font-weight:500; white-space:nowrap}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr{transition:background .15s}
+  tbody tr:hover{background:var(--surface-2)}
+  td.num{font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+
+  /* ── mermaid ──────────────────────────────────── */
+  .diagram{background:var(--surface); border:1px solid var(--rule);
+    padding:18px 20px 20px; margin:22px 0; overflow-x:auto; text-align:center;
+    width:min(1460px, calc(100vw - 40px)); margin-left:50%; transform:translateX(-50%)}
+  .diagram .cap{font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); display:block; margin-bottom:12px; text-align:left}
+  .diagram svg{max-width:100%; height:auto; display:block; margin:0 auto}
+  /* Edge labels are real <p> inside a foreignObject, so the document's paragraph
+     margin lands inside the figures and shifts every label off its arrow. */
+  .diagram svg p{margin:0}
+  /* On a phone, shrinking a 1370px figure to fit gives ~4px labels. Hold each
+     figure at its own natural width and scroll it inside its box instead. */
+  @media (max-width:820px){
+    .diagram{padding-bottom:14px}
+    .diagram svg{max-width:none; width:var(--nat-w); margin:0}
+    .diagram .cap::after{content:' · scroll \2192'; color:var(--accent)}
+  }
+
+  /* ── animated bars ────────────────────────────── */
+  .bars{display:flex; flex-direction:column; gap:13px; margin:18px 0}
+  .bar-row{display:grid; grid-template-columns:200px 1fr 66px; gap:14px; align-items:center}
+  .bar-lab{font-size:.85rem; color:var(--ink-soft)}
+  .bar-lab b{display:block; color:var(--ink); font-weight:620}
+  .bar-tr{background:var(--surface-2); border:1px solid var(--rule); height:26px; overflow:hidden}
+  .bar-fl{height:100%; width:0; transition:width 1.1s cubic-bezier(.22,.9,.28,1)}
+  .bar-fl.crit{background:var(--crit)} .bar-fl.sea{background:var(--seal)}
+  .bar-fl.ok{background:var(--ok)} .bar-fl.acc{background:var(--accent)}
+  .bar-val{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:.95rem; font-weight:600; text-align:right}
+
+  /* ── pipeline strip ───────────────────────────── */
+  .flow{display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-family:var(--mono); font-size:.75rem; margin:14px 0}
+  /* Scoped to .flow deliberately: the inlined figures use mermaid's own markup,
+     where every box is <g class="node"> and several carry class="reuse". An
+     unscoped .node:hover shifted those groups while their arrows stayed put. */
+  .flow .node{background:var(--surface-2); border:1px solid var(--rule); padding:5px 10px; white-space:nowrap; transition:transform .2s, border-color .2s}
+  .flow .node:hover{transform:translateY(-2px); border-color:var(--accent)}
+  .flow .node.new{background:var(--seal-soft); border-color:var(--seal)}
+  .flow .node.reuse{background:var(--accent-soft); border-color:var(--accent)}
+  .flow .arrow{color:var(--ink-faint)}
+
+  /* ── phase cards ──────────────────────────────── */
+  .phases{display:flex; flex-direction:column; gap:10px; margin-top:8px}
+  .phase{display:grid; grid-template-columns:56px 1fr 190px; gap:18px; border:1px solid var(--rule); background:var(--surface); padding:15px 18px; border-left:3px solid var(--idle); transition:transform .18s, box-shadow .18s}
+  .phase:hover{transform:translateX(3px)}
+  .phase.done{border-left-color:var(--ok)}
+  .phase.next{border-left-color:var(--seal)}
+  .phase.block{border-left-color:var(--crit)}
+  .ph-id{font-family:var(--mono); font-size:1.1rem; font-weight:700; color:var(--ink-faint)}
+  .phase.done .ph-id{color:var(--ok)} .phase.next .ph-id{color:var(--seal)} .phase.block .ph-id{color:var(--crit)}
+  .ph-body h3{margin:0 0 5px; font-size:1rem}
+  .ph-body p{margin:0; font-size:.9rem; color:var(--ink-soft); max-width:62ch}
+  .ph-meta{font-family:var(--mono); font-size:.75rem; color:var(--ink-soft)}
+
+  ul.tight{margin:8px 0 16px; padding-left:20px}
+  ul.tight li{margin:0 0 7px; font-size:.95rem; color:var(--ink-soft)}
+  ul.tight li strong{color:var(--ink)}
+  .note{border-left:2px solid var(--seal); background:var(--seal-soft); padding:13px 16px; font-size:.93rem; margin:16px 0}
+
+  /* ── theme toggle ─────────────────────────────── */
+  .toggle{position:fixed; top:16px; right:16px; z-index:50; font-family:var(--mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; background:var(--surface); color:var(--ink-soft); border:1px solid var(--rule); padding:7px 12px; cursor:pointer}
+  .toggle:hover{border-color:var(--accent); color:var(--accent)}
+  .toggle:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  /* ── TOC ──────────────────────────────────────── */
+  .toc{border:1px solid var(--rule); background:var(--surface); padding:18px 22px; margin:0 0 44px}
+  .toc h3{margin:0 0 12px; font-size:.95rem}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:32px}
+  .toc li{margin:0 0 6px; font-size:.9rem}
+  .toc a{color:var(--ink-soft); text-decoration:none}
+  .toc a:hover{color:var(--accent); text-decoration:underline}
+
+  a{color:var(--accent)}
+  a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important}
+    .reveal{opacity:1; transform:none}
+    .bar-fl{transition:none}
+  }
+  @media (max-width:760px){
+    .phase{grid-template-columns:44px 1fr}
+    .ph-meta{grid-column:1/-1}
+    .bar-row{grid-template-columns:130px 1fr 54px}
+    .toc ol{columns:1}
+  }
+</style>
+</head>
+<body>
+<button class="toggle" id="themeToggle" aria-label="Toggle colour theme">theme</button>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Grasph · branch <span class="mono">dev/rfp-automation</span></p>
+  <h1>Teaching a database to answer a 127-page tender</h1>
+  <p class="standfirst">
+    What we have been building, why each decision was made, what it measures, and what
+    is left. Written for the whole team — every section explains itself in plain
+    language first, then in engineering detail.
+  </p>
+  <div class="colophon">
+    <span><b>Status</b> Phase 0 + Phase 3 complete, measured</span>
+    <span><b>Branch</b> dev/rfp-automation, local only</span>
+    <span><b>Tests</b> 428 server · 824 storage</span>
+    <span><b>Updated</b> 2026-07-27</span>
+  </div>
+</header>
+
+<nav class="toc reveal">
+  <h3>What's in here</h3>
+  <ol>
+    <li><a href="#problem">The problem, in plain English</a></li>
+    <li><a href="#loop">What the system actually does</a></li>
+    <li><a href="#documents">The two documents (the bit people get backwards)</a></li>
+    <li><a href="#why-grasph">Why build it inside Grasph</a></li>
+    <li><a href="#golden">Phase 0: building a ruler before measuring</a></li>
+    <li><a href="#findings">Four findings that changed the design</a></li>
+    <li><a href="#built">Phase 3: what we built</a></li>
+    <li><a href="#results">What it measures</a></li>
+    <li><a href="#bugs">The bugs, and why they were invisible</a></li>
+    <li><a href="#left">What's left</a></li>
+    <li><a href="#questions">What we need from you</a></li>
+  </ol>
+</nav>
+
+<!-- ══════════════ 1 ══════════════ -->
+<section id="problem" class="reveal">
+  <div class="sec-head"><span class="sec-num">01</span><h2>The problem, in plain English</h2></div>
+
+  <div class="lane">
+    <span class="lane-tag">Plain english</span>
+    <p>
+      When a government department or a large company wants to buy services — banking,
+      IT, staffing, consulting — they publish a document called an <strong>RFP</strong>
+      (Request For Proposal). It is long, often 100+ pages, and it contains hundreds of
+      questions the vendor must answer: <em>"Describe your disaster recovery approach."</em>
+      <em>"What fees apply to wire transfers?"</em> <em>"Provide biographical information
+      for key personnel."</em>
+    </p>
+    <p>
+      Answering one is a slog that takes a team weeks. And here is the thing: <strong>most
+      of the answers already exist.</strong> The company has written dozens of proposals
+      before. The disaster-recovery answer is sitting in a proposal from two years ago.
+      The team is mostly hunting through old documents, copying, and adapting.
+    </p>
+    <p>
+      So the job is: <strong>read the new RFP, find the matching answers in the old
+      proposals, draft them, and be honest about what is missing.</strong>
+    </p>
+  </div>
+
+  <div class="lane tech">
+    <span class="lane-tag">Technical</span>
+    <p>
+      Formally this is retrieval-augmented generation with a compliance spine. Input is
+      an RFP document; output is a <strong>compliance matrix</strong> — one row per
+      requirement, each carrying a coverage verdict, a drafted answer, and citations to
+      the source pages the draft came from.
+    </p>
+    <p>
+      The hard parts are not the drafting. They are <strong>enumerating the requirements
+      completely</strong> (a missed mandatory item can disqualify a bid), <strong>knowing
+      when the knowledge base genuinely cannot answer</strong> (inventing an answer is
+      worse than admitting a gap), and <strong>never auto-drafting anything commercial or
+      legal</strong> (an invented fee in a submitted bid is a contractual problem, not a
+      quality problem).
+    </p>
+  </div>
+
+  <div class="callout acc">
+    <h3>The single rule everything else follows from</h3>
+    <p>
+      <strong>An honest "I don't know" is worth more than a plausible answer.</strong>
+      A proposal is a contract document. If the system invents a certification the company
+      does not hold, or a fee it does not charge, the damage is legal and commercial — not
+      a bad user experience. Every design decision below traces back to this.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 2 ══════════════ -->
+<section id="loop" class="reveal">
+  <div class="sec-head"><span class="sec-num">02</span><h2>What the system actually does</h2></div>
+
+  <p class="lede spine">Five steps. Each one is a place where it can go wrong, and each has its own safeguard.</p>
+
+  <div class="flow">
+    <span class="node new">1 · mine requirements</span><span class="arrow">→</span>
+    <span class="node new">2 · route commercial items to a human</span><span class="arrow">→</span>
+    <span class="node reuse">3 · retrieve evidence</span><span class="arrow">→</span>
+    <span class="node new">4 · judge &amp; draft</span><span class="arrow">→</span>
+    <span class="node new">5 · compliance matrix</span>
+  </div>
+  <p style="font-size:.82rem;color:var(--ink-faint)">
+    <span class="chip acc">teal</span> existing Grasph capability &nbsp;·&nbsp;
+    <span class="chip sea">ochre</span> built for this project
+  </p>
+
+  <div class="diagram">
+    <span class="cap">Figure 1 — the loop, with the safeguard at each stage</span>
+    <svg id="m_fig1" width="100%" xmlns="http://www.w3.org/2000/svg" class="flowchart" style="--nat-w:1366px; max-width: 1365.747802734375px;" viewBox="0 0 1365.747802734375 299.3828125" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#m_fig1{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;fill:var(--ink);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#m_fig1 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#m_fig1 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#m_fig1 .error-icon{fill:var(--surface-2);}#m_fig1 .error-text{fill:#bfbfbf;stroke:#bfbfbf;}#m_fig1 .edge-thickness-normal{stroke-width:1px;}#m_fig1 .edge-thickness-thick{stroke-width:3.5px;}#m_fig1 .edge-pattern-solid{stroke-dasharray:0;}#m_fig1 .edge-thickness-invisible{stroke-width:0;fill:none;}#m_fig1 .edge-pattern-dashed{stroke-dasharray:3;}#m_fig1 .edge-pattern-dotted{stroke-dasharray:2;}#m_fig1 .marker{fill:var(--rule);stroke:var(--rule);}#m_fig1 .marker.cross{stroke:var(--rule);}#m_fig1 svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;}#m_fig1 p{margin:0;}#m_fig1 .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);}#m_fig1 .cluster-label text{fill:var(--ink);}#m_fig1 .cluster-label span{color:var(--ink);}#m_fig1 .cluster-label span p{background-color:transparent;}#m_fig1 .label text,#m_fig1 span{fill:var(--ink);color:var(--ink);}#m_fig1 .node rect,#m_fig1 .node circle,#m_fig1 .node ellipse,#m_fig1 .node polygon,#m_fig1 .node path{fill:var(--surface);stroke:var(--rule);stroke-width:1px;}#m_fig1 .rough-node .label text,#m_fig1 .node .label text,#m_fig1 .image-shape .label,#m_fig1 .icon-shape .label{text-anchor:middle;}#m_fig1 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#m_fig1 .rough-node .label,#m_fig1 .node .label,#m_fig1 .image-shape .label,#m_fig1 .icon-shape .label{text-align:center;}#m_fig1 .node.clickable{cursor:pointer;}#m_fig1 .root .anchor path{fill:var(--rule)!important;stroke-width:0;stroke:var(--rule);}#m_fig1 .arrowheadPath{fill:var(--rule);}#m_fig1 .edgePath .path{stroke:var(--rule);stroke-width:1px;}#m_fig1 .flowchart-link{stroke:var(--rule);fill:none;}#m_fig1 .edgeLabel{background-color:var(--surface);text-align:center;}#m_fig1 .edgeLabel p{background-color:var(--surface);}#m_fig1 .edgeLabel rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig1 .labelBkg{background-color:rgba(48, 48, 48, 0.5);}#m_fig1 .cluster rect{fill:var(--surface-2);stroke:var(--rule);stroke-width:1px;}#m_fig1 .cluster text{fill:var(--ink);}#m_fig1 .cluster span{color:var(--ink);}#m_fig1 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:12px;background:var(--surface-2);border:1px solid hsl(0, 0%, 15.0980392157%);border-radius:2px;pointer-events:none;z-index:100;}#m_fig1 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:var(--ink);}#m_fig1 rect.text{fill:none;stroke-width:0;}#m_fig1 .icon-shape,#m_fig1 .image-shape{background-color:var(--surface);text-align:center;}#m_fig1 .icon-shape p,#m_fig1 .image-shape p{background-color:var(--surface);padding:2px;}#m_fig1 .icon-shape .label rect,#m_fig1 .image-shape .label rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig1 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#m_fig1 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#m_fig1 .node .neo-node{stroke:var(--rule);}#m_fig1 [data-look="neo"].node rect,#m_fig1 [data-look="neo"].cluster rect,#m_fig1 [data-look="neo"].node polygon{stroke:url(#m_fig1-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig1 [data-look="neo"].swimlane.cluster rect{filter:none;}#m_fig1 [data-look="neo"].node path{stroke:url(#m_fig1-gradient);stroke-width:1px;}#m_fig1 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig1 [data-look="neo"].node .neo-line path{stroke:var(--rule);filter:none;}#m_fig1 [data-look="neo"].node circle{stroke:url(#m_fig1-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig1 [data-look="neo"].node circle .state-start{fill:#000000;}#m_fig1 [data-look="neo"].icon-shape .icon{fill:url(#m_fig1-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig1 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#m_fig1-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig1 :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}#m_fig1 .base rect{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig1 .base polygon{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig1 .base ellipse{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig1 .base circle{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig1 .base path{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig1 .base tspan{fill:var(--ink)!important;}#m_fig1 .reuse rect{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .reuse polygon{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .reuse ellipse{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .reuse circle{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .reuse path{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .reuse tspan{fill:var(--ink)!important;}#m_fig1 .built rect{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .built polygon{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .built ellipse{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .built circle{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .built path{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .built tspan{fill:var(--ink)!important;}#m_fig1 .good rect{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .good polygon{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .good ellipse{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .good circle{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .good path{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .good tspan{fill:var(--ink)!important;}#m_fig1 .bad rect{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .bad polygon{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .bad ellipse{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .bad circle{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .bad path{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig1 .bad tspan{fill:var(--ink)!important;}#m_fig1 .quiet rect{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig1 .quiet polygon{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig1 .quiet ellipse{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig1 .quiet circle{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig1 .quiet path{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig1 .quiet tspan{fill:var(--ink-soft)!important;}</style><g><marker id="m_fig1_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig1_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig1_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig1_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="m_fig1_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig1_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig1_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig1_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig1_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig1_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig1_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="m_fig1_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M181.104,164.383L184.938,164.383C188.771,164.383,196.438,164.383,203.438,164.383C210.438,164.383,216.771,164.383,219.938,164.383L223.104,164.383" id="m_fig1-L_MINE_ROUTE_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_MINE_ROUTE_0" data-points="W3sieCI6MTgxLjEwNDE3MTc1MjkyOTcsInkiOjE2NC4zODI4MTYzMTQ2OTcyN30seyJ4IjoyMDQuMTA0MTcxNzUyOTI5NywieSI6MTY0LjM4MjgxNjMxNDY5NzI3fSx7IngiOjIyNy4xMDQxNzE3NTI5Mjk2MywieSI6MTY0LjM4MjgxNjMxNDY5NzI3fV0=" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path><path d="M345.063,200.226L356.549,210.252C368.034,220.278,391.004,240.33,421.869,250.357C452.734,260.383,491.495,260.383,536.791,260.383C582.088,260.383,633.92,260.383,687.76,260.383C741.6,260.383,797.446,260.383,847.142,260.383C896.838,260.383,940.384,260.383,967.387,260.383C994.389,260.383,1004.85,260.383,1010.08,260.383L1015.31,260.383" id="m_fig1-L_ROUTE_HUMAN_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_ROUTE_HUMAN_0" data-points="W3sieCI6MzQ1LjA2MzQzNDg5MjI1MTIsInkiOjIwMC4yMjU2MzE0MjI0NDZ9LHsieCI6NDEzLjk3Mzk1ODk2OTExNjIsInkiOjI2MC4zODI4MTYzMTQ2OTcyN30seyJ4Ijo1MzAuMjU1MjA3MDYxNzY3NiwieSI6MjYwLjM4MjgxNjMxNDY5NzI3fSx7IngiOjY4NS43NTMwODk5MDQ3ODUyLCJ5IjoyNjAuMzgyODE2MzE0Njk3Mjd9LHsieCI6ODUzLjI5MjY0NDUwMDczMjQsInkiOjI2MC4zODI4MTYzMTQ2OTcyN30seyJ4Ijo5ODMuOTI5MDM5OTU1MTM5MiwieSI6MjYwLjM4MjgxNjMxNDY5NzI3fSx7IngiOjEwMTkuMzEwMjI0NTMzMDgxLCJ5IjoyNjAuMzgyODE2MzE0Njk3Mjd9XQ==" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path><path d="M353.432,136.908L363.522,131.3C373.613,125.691,393.793,114.473,408.728,108.864C423.663,103.255,433.352,103.255,438.197,103.255L443.042,103.255" id="m_fig1-L_ROUTE_RETR_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_ROUTE_RETR_0" data-points="W3sieCI6MzUzLjQzMTgxMDcxMjg3MDQsInkiOjEzNi45MDgzNzcwMjc1Njc3Mn0seyJ4Ijo0MTMuOTczOTU4OTY5MTE2MiwieSI6MTAzLjI1NTIxMDg3NjQ2NDg0fSx7IngiOjQ0Ny4wNDE2Njc5MzgyMzI0LCJ5IjoxMDMuMjU1MjEwODc2NDY0ODR9XQ==" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path><path d="M613.469,103.255L625.516,103.255C637.564,103.255,661.658,103.255,685.086,103.255C708.515,103.255,731.276,103.255,742.657,103.255L754.037,103.255" id="m_fig1-L_RETR_JUDGE_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_RETR_JUDGE_0" data-points="W3sieCI6NjEzLjQ2ODc0NjE4NTMwMjcsInkiOjEwMy4yNTUyMTA4NzY0NjQ4NH0seyJ4Ijo2ODUuNzUzMDg5OTA0Nzg1MiwieSI6MTAzLjI1NTIxMDg3NjQ2NDg0fSx7IngiOjc1OC4wMzc0MzM2MjQyNjc2LCJ5IjoxMDMuMjU1MjEwODc2NDY0ODZ9XQ==" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path><path d="M922.953,77.66L933.115,73.926C943.278,70.192,963.604,62.723,980.773,58.989C997.942,55.255,1011.954,55.255,1018.96,55.255L1025.966,55.255" id="m_fig1-L_JUDGE_DRAFT_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_JUDGE_DRAFT_0" data-points="W3sieCI6OTIyLjk1MjU2NjYzMTkyNDQsInkiOjc3LjY1OTkyMjEzMTE5MTl9LHsieCI6OTgzLjkyOTAzOTk1NTEzOTIsInkiOjU1LjI1NTIxMDg3NjQ2NDg0NH0seyJ4IjoxMDI5Ljk2NjQ3NDUzMzA4MSwieSI6NTUuMjU1MjEwODc2NDY0ODQ0fV0=" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path><path d="M922.953,128.85L933.115,132.585C943.278,136.319,963.604,143.787,980.304,147.521C997.004,151.255,1010.079,151.255,1016.616,151.255L1023.154,151.255" id="m_fig1-L_JUDGE_GAP_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_JUDGE_GAP_0" data-points="W3sieCI6OTIyLjk1MjU2NjYzMTkyNDIsInkiOjEyOC44NTA0OTk2MjE3Mzc5fSx7IngiOjk4My45MjkwMzk5NTUxMzkyLCJ5IjoxNTEuMjU1MjEwODc2NDY0ODR9LHsieCI6MTAyNy4xNTM5NzQ1MzMwODEsInkiOjE1MS4yNTUyMTA4NzY0NjQ4NH1d" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path><path d="M1170.06,55.255L1175.67,55.255C1181.279,55.255,1192.498,55.255,1207.644,65.598C1222.79,75.942,1241.864,96.628,1251.401,106.971L1260.937,117.314" id="m_fig1-L_DRAFT_MATRIX_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_DRAFT_MATRIX_0" data-points="W3sieCI6MTE3MC4wNjAyMjQ1MzMwODEsInkiOjU1LjI1NTIxMDg3NjQ2NDg0NH0seyJ4IjoxMjAzLjcxNjQ3NDUzMzA4MSwieSI6NTUuMjU1MjEwODc2NDY0ODQ0fSx7IngiOjEyNjMuNjQ4OTI4OTYwMTY0MywieSI6MTIwLjI1NTIxMDg3NjQ2NDg0fV0=" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path><path d="M1172.873,151.255L1178.013,151.255C1183.154,151.255,1193.435,151.255,1201.743,151.255C1210.05,151.255,1216.383,151.255,1219.55,151.255L1222.716,151.255" id="m_fig1-L_GAP_MATRIX_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_GAP_MATRIX_0" data-points="W3sieCI6MTE3Mi44NzI3MjQ1MzMwODEsInkiOjE1MS4yNTUyMTA4NzY0NjQ4NH0seyJ4IjoxMjAzLjcxNjQ3NDUzMzA4MSwieSI6MTUxLjI1NTIxMDg3NjQ2NDg0fSx7IngiOjEyMjYuNzE2NDc0NTMzMDgxLCJ5IjoxNTEuMjU1MjEwODc2NDY0ODR9XQ==" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path><path d="M1180.716,260.383L1184.55,260.383C1188.383,260.383,1196.05,260.383,1210.025,247.879C1224,235.376,1244.284,210.369,1254.426,197.865L1264.568,185.362" id="m_fig1-L_HUMAN_MATRIX_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_HUMAN_MATRIX_0" data-points="W3sieCI6MTE4MC43MTY0NzQ1MzMwODEsInkiOjI2MC4zODI4MTYzMTQ2OTcyN30seyJ4IjoxMjAzLjcxNjQ3NDUzMzA4MSwieSI6MjYwLjM4MjgxNjMxNDY5NzI3fSx7IngiOjEyNjcuMDg3MzY3NjkzODY2LCJ5IjoxODIuMjU1MjEwODc2NDY0ODR9XQ==" data-look="classic" marker-end="url(#m_fig1_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_MINE_ROUTE_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel" transform="translate(685.7530899047852, 260.38281631469727)"><g class="label" data-id="L_ROUTE_HUMAN_0" transform="translate(-0.003093719482421875, -23.39999830722809)"><g><rect class="background" style="" x="-49.28125" y="-3.333333373069763" width="98.56868743896484" height="53.4666633605957"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">yes</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">fees</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> ·</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> insurance</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="2.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">signatures</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(413.9739589691162, 103.25521087646484)"><g class="label" data-id="L_ROUTE_RETR_0" transform="translate(0, -8.000000596046448)"><g><rect class="background" style="" x="-10.067708969116211" y="-3.333333373069763" width="20.135417938232422" height="22.666667938232422"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">no</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_RETR_JUDGE_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel" transform="translate(983.9290399551392, 55.255210876464844)"><g class="label" data-id="L_JUDGE_DRAFT_0" transform="translate(0.30631446838378906, -8.000000596046448)"><g><rect class="background" style="" x="-12.6875" y="-3.333333373069763" width="24.762371063232422" height="22.666667938232422"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">yes</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(983.9290399551392, 151.25521087646484)"><g class="label" data-id="L_JUDGE_GAP_0" transform="translate(0, -8.000000596046448)"><g><rect class="background" style="" x="-10.067708969116211" y="-3.333333373069763" width="20.135417938232422" height="22.666667938232422"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">no</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_DRAFT_MATRIX_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_GAP_MATRIX_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_HUMAN_MATRIX_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g></g><g class="nodes"><g class="node default built " id="m_fig1-flowchart-MINE-0" data-look="classic" transform="translate(94.55208587646484, 164.38281631469727)"><rect class="basic label-container" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important" x="-86.55208587646484" y="-41.5" width="173.1041717529297" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-66.55208587646484, -31.5)"><rect></rect><foreignObject width="133.1041717529297" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>1 · Mine the RFP<br/>127 pages in<br/>622 requirements out</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig1-flowchart-ROUTE-2" data-look="classic" transform="translate(304.00521087646484, 164.38281631469727)"><polygon points="76.90104293823242,0 153.80208587646484,-76.90104293823242 76.90104293823242,-153.80208587646484 0,-76.90104293823242" class="label-container" transform="translate(-76.40104293823242, 76.90104293823242)" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important"></polygon><g class="label" style="color:var(--ink) !important" transform="translate(-45.90104293823242, -21)"><rect></rect><foreignObject width="91.80208587646484" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>2 · Commercial<br/>or legal?</p></span></div></foreignObject></g></g><g class="node default bad " id="m_fig1-flowchart-HUMAN-4" data-look="classic" transform="translate(1100.013349533081, 260.38281631469727)"><rect class="basic label-container" style="fill:var(--crit-soft) !important;stroke:var(--crit) !important;stroke-width:1.5px !important" x="-80.703125" y="-31" width="161.40625" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-60.703125, -21)"><rect></rect><foreignObject width="121.40625" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>A person writes this<br/>never auto-drafted</p></span></div></foreignObject></g></g><g class="node default reuse " id="m_fig1-flowchart-RETR-6" data-look="classic" transform="translate(530.2552070617676, 103.25521087646484)"><rect class="basic label-container" style="fill:var(--accent-soft) !important;stroke:var(--accent) !important;stroke-width:1.5px !important" x="-83.21354293823242" y="-31" width="166.42708587646484" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-63.21354293823242, -21)"><rect></rect><foreignObject width="126.42708587646484" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>3 · Retrieve evidence<br/>from past proposals</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig1-flowchart-JUDGE-8" data-look="classic" transform="translate(853.2926445007324, 103.25521087646484)"><polygon points="95.25521087646484,0 190.5104217529297,-95.25521087646484 95.25521087646484,-190.5104217529297 0,-95.25521087646484" class="label-container" transform="translate(-94.75521087646484, 95.25521087646484)" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important"></polygon><g class="label" style="color:var(--ink) !important" transform="translate(-64.25521087646484, -21)"><rect></rect><foreignObject width="128.5104217529297" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>4 · Do these excerpts<br/>actually answer it?</p></span></div></foreignObject></g></g><g class="node default good " id="m_fig1-flowchart-DRAFT-10" data-look="classic" transform="translate(1100.013349533081, 55.255210876464844)"><rect class="basic label-container" style="fill:var(--ok-soft) !important;stroke:var(--ok) !important;stroke-width:1.5px !important" x="-70.046875" y="-31" width="140.09375" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-50.046875, -21)"><rect></rect><foreignObject width="100.09375" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>Grounded draft<br/>+ page citations</p></span></div></foreignObject></g></g><g class="node default bad " id="m_fig1-flowchart-GAP-12" data-look="classic" transform="translate(1100.013349533081, 151.25521087646484)"><rect class="basic label-container" style="fill:var(--crit-soft) !important;stroke:var(--crit) !important;stroke-width:1.5px !important" x="-72.859375" y="-31" width="145.71875" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-52.859375, -21)"><rect></rect><foreignObject width="105.71875" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>Gap<br/>an honest refusal</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig1-flowchart-MATRIX-14" data-look="classic" transform="translate(1292.232099533081, 151.25521087646484)"><rect class="basic label-container" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important" x="-65.515625" y="-31" width="131.03125" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-45.515625, -21)"><rect></rect><foreignObject width="91.03125" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>5 · Compliance<br/>matrix</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="m_fig1-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="m_fig1-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="m_fig1-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--seal)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 15.0980392157%)" stop-opacity="1"></stop></linearGradient></svg>
+  </div>
+
+  <div class="lane">
+    <span class="lane-tag">Why the fork at step 2 exists</span>
+    <p>
+      Anything about money or signatures is pulled out <strong>before the system even
+      looks for an answer</strong>. Not because it could not draft one, but because a
+      drafted fee is a number nobody has approved. A person writes those. This costs a
+      reviewer a few minutes; the alternative costs a contract.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 3 ══════════════ -->
+<section id="documents" class="reveal">
+  <div class="sec-head"><span class="sec-num">03</span><h2>The two documents — the bit people get backwards</h2></div>
+
+  <p class="lede spine">
+    There are always two documents in play, and confusing them produces a system that
+    searches the RFP for answers to the RFP.
+  </p>
+
+  <div class="diagram">
+    <span class="cap">Figure 2 — one document is ingested, the other never is</span>
+    <svg id="m_fig2" width="100%" xmlns="http://www.w3.org/2000/svg" class="flowchart" style="--nat-w:947px; max-width: 947.3017578125px;" viewBox="0.00000762939453125 0 947.3017578125 216" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#m_fig2{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;fill:var(--ink);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#m_fig2 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#m_fig2 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#m_fig2 .error-icon{fill:var(--surface-2);}#m_fig2 .error-text{fill:#bfbfbf;stroke:#bfbfbf;}#m_fig2 .edge-thickness-normal{stroke-width:1px;}#m_fig2 .edge-thickness-thick{stroke-width:3.5px;}#m_fig2 .edge-pattern-solid{stroke-dasharray:0;}#m_fig2 .edge-thickness-invisible{stroke-width:0;fill:none;}#m_fig2 .edge-pattern-dashed{stroke-dasharray:3;}#m_fig2 .edge-pattern-dotted{stroke-dasharray:2;}#m_fig2 .marker{fill:var(--rule);stroke:var(--rule);}#m_fig2 .marker.cross{stroke:var(--rule);}#m_fig2 svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;}#m_fig2 p{margin:0;}#m_fig2 .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);}#m_fig2 .cluster-label text{fill:var(--ink);}#m_fig2 .cluster-label span{color:var(--ink);}#m_fig2 .cluster-label span p{background-color:transparent;}#m_fig2 .label text,#m_fig2 span{fill:var(--ink);color:var(--ink);}#m_fig2 .node rect,#m_fig2 .node circle,#m_fig2 .node ellipse,#m_fig2 .node polygon,#m_fig2 .node path{fill:var(--surface);stroke:var(--rule);stroke-width:1px;}#m_fig2 .rough-node .label text,#m_fig2 .node .label text,#m_fig2 .image-shape .label,#m_fig2 .icon-shape .label{text-anchor:middle;}#m_fig2 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#m_fig2 .rough-node .label,#m_fig2 .node .label,#m_fig2 .image-shape .label,#m_fig2 .icon-shape .label{text-align:center;}#m_fig2 .node.clickable{cursor:pointer;}#m_fig2 .root .anchor path{fill:var(--rule)!important;stroke-width:0;stroke:var(--rule);}#m_fig2 .arrowheadPath{fill:var(--rule);}#m_fig2 .edgePath .path{stroke:var(--rule);stroke-width:1px;}#m_fig2 .flowchart-link{stroke:var(--rule);fill:none;}#m_fig2 .edgeLabel{background-color:var(--surface);text-align:center;}#m_fig2 .edgeLabel p{background-color:var(--surface);}#m_fig2 .edgeLabel rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig2 .labelBkg{background-color:rgba(48, 48, 48, 0.5);}#m_fig2 .cluster rect{fill:var(--surface-2);stroke:var(--rule);stroke-width:1px;}#m_fig2 .cluster text{fill:var(--ink);}#m_fig2 .cluster span{color:var(--ink);}#m_fig2 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:12px;background:var(--surface-2);border:1px solid hsl(0, 0%, 15.0980392157%);border-radius:2px;pointer-events:none;z-index:100;}#m_fig2 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:var(--ink);}#m_fig2 rect.text{fill:none;stroke-width:0;}#m_fig2 .icon-shape,#m_fig2 .image-shape{background-color:var(--surface);text-align:center;}#m_fig2 .icon-shape p,#m_fig2 .image-shape p{background-color:var(--surface);padding:2px;}#m_fig2 .icon-shape .label rect,#m_fig2 .image-shape .label rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig2 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#m_fig2 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#m_fig2 .node .neo-node{stroke:var(--rule);}#m_fig2 [data-look="neo"].node rect,#m_fig2 [data-look="neo"].cluster rect,#m_fig2 [data-look="neo"].node polygon{stroke:url(#m_fig2-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig2 [data-look="neo"].swimlane.cluster rect{filter:none;}#m_fig2 [data-look="neo"].node path{stroke:url(#m_fig2-gradient);stroke-width:1px;}#m_fig2 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig2 [data-look="neo"].node .neo-line path{stroke:var(--rule);filter:none;}#m_fig2 [data-look="neo"].node circle{stroke:url(#m_fig2-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig2 [data-look="neo"].node circle .state-start{fill:#000000;}#m_fig2 [data-look="neo"].icon-shape .icon{fill:url(#m_fig2-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig2 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#m_fig2-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig2 :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}#m_fig2 .base rect{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig2 .base polygon{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig2 .base ellipse{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig2 .base circle{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig2 .base path{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig2 .base tspan{fill:var(--ink)!important;}#m_fig2 .reuse rect{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .reuse polygon{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .reuse ellipse{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .reuse circle{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .reuse path{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .reuse tspan{fill:var(--ink)!important;}#m_fig2 .built rect{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .built polygon{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .built ellipse{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .built circle{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .built path{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .built tspan{fill:var(--ink)!important;}#m_fig2 .good rect{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .good polygon{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .good ellipse{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .good circle{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .good path{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .good tspan{fill:var(--ink)!important;}#m_fig2 .bad rect{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .bad polygon{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .bad ellipse{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .bad circle{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .bad path{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig2 .bad tspan{fill:var(--ink)!important;}#m_fig2 .quiet rect{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig2 .quiet polygon{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig2 .quiet ellipse{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig2 .quiet circle{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig2 .quiet path{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig2 .quiet tspan{fill:var(--ink-soft)!important;}</style><g><marker id="m_fig2_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig2_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig2_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig2_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="m_fig2_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig2_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig2_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig2_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig2_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig2_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig2_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="m_fig2_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M208.151,49.5L226.144,49.5C244.137,49.5,280.123,49.5,318.724,49.5C357.324,49.5,398.54,49.5,419.147,49.5L439.755,49.5" id="m_fig2-L_RFP_Q_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_RFP_Q_0" data-points="W3sieCI6MjA4LjE1MTAzOTEyMzUzNTE2LCJ5Ijo0OS41fSx7IngiOjMxNi4xMDkyMTQ3ODI3MTQ4NCwieSI6NDkuNX0seyJ4Ijo0NDMuNzU0ODkwNDQxODk0NTMsInkiOjQ5LjV9XQ==" data-look="classic" marker-end="url(#m_fig2_flowchart-v2-pointEnd)"></path><path d="M220.521,166.5L236.452,166.5C252.384,166.5,284.246,166.5,315.443,166.5C346.639,166.5,377.168,166.5,392.433,166.5L407.698,166.5" id="m_fig2-L_KB_IDX_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_KB_IDX_0" data-points="W3sieCI6MjIwLjUyMDgyODI0NzA3MDMsInkiOjE2Ni41fSx7IngiOjMxNi4xMDkyMTQ3ODI3MTQ4NCwieSI6MTY2LjV9LHsieCI6NDExLjY5NzYwMTMxODM1OTQsInkiOjE2Ni41fV0=" data-look="classic" marker-end="url(#m_fig2_flowchart-v2-pointEnd)"></path><path d="M592.161,49.5L601.337,49.5C610.514,49.5,628.866,49.5,644.613,55.57C660.36,61.641,673.502,73.782,680.073,79.852L686.644,85.922" id="m_fig2-L_Q_SEARCH_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Q_SEARCH_0" data-points="W3sieCI6NTkyLjE2MTE0MDQ0MTg5NDUsInkiOjQ5LjV9LHsieCI6NjQ3LjIxODQyOTU2NTQyOTcsInkiOjQ5LjV9LHsieCI6Njg5LjU4MTcwNDg3NzczNjksInkiOjg4LjYzNjcyNDY4NzY5Mjg4fV0=" data-look="classic" marker-end="url(#m_fig2_flowchart-v2-pointEnd)"></path><path d="M624.218,166.5L628.052,166.5C631.885,166.5,639.552,166.5,649.956,160.43C660.36,154.359,673.502,142.218,680.073,136.148L686.644,130.078" id="m_fig2-L_IDX_SEARCH_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_IDX_SEARCH_0" data-points="W3sieCI6NjI0LjIxODQyOTU2NTQyOTcsInkiOjE2Ni41fSx7IngiOjY0Ny4yMTg0Mjk1NjU0Mjk3LCJ5IjoxNjYuNX0seyJ4Ijo2ODkuNTgxNzA0ODc3NzM2OSwieSI6MTI3LjM2MzI3NTMxMjMwNzE3fV0=" data-look="classic" marker-end="url(#m_fig2_flowchart-v2-pointEnd)"></path><path d="M750.864,108L754.698,108C758.531,108,766.198,108,773.198,108C780.198,108,786.531,108,789.698,108L792.864,108" id="m_fig2-L_SEARCH_ANS_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_SEARCH_ANS_0" data-points="W3sieCI6NzUwLjg2NDI2NTQ0MTg5NDUsInkiOjEwOH0seyJ4Ijo3NzMuODY0MjY1NDQxODk0NSwieSI6MTA4fSx7IngiOjc5Ni44NjQyNjU0NDE4OTQ1LCJ5IjoxMDh9XQ==" data-look="classic" marker-end="url(#m_fig2_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(316.10921478271484, 49.5)"><g class="label" data-id="L_RFP_Q_0" transform="translate(0, -15.699999451637268)"><g><rect class="background" style="" x="-52.125" y="-3.333333373069763" width="104.25" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">parsed</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> and</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> read</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">NEVER</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> ingested</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(316.10921478271484, 166.5)"><g class="label" data-id="L_KB_IDX_0" transform="translate(-0.0050506591796875, -15.699999451637268)"><g><rect class="background" style="" x="-72.58333587646484" y="-3.333333373069763" width="145.17677307128906" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">INGESTED</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">namespace</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> rfp_finance</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_Q_SEARCH_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_IDX_SEARCH_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_SEARCH_ANS_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g></g><g class="nodes"><g class="node default built " id="m_fig2-flowchart-RFP-0" data-look="classic" transform="translate(114.26041412353516, 49.5)"><rect class="basic label-container" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important" x="-93.890625" y="-41.5" width="187.78125" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-73.890625, -31.5)"><rect></rect><foreignObject width="147.78125" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>RFP TRE25101<br/>Delaware · 2025 · 127pp<br/>the questions</p></span></div></foreignObject></g></g><g class="node default reuse " id="m_fig2-flowchart-KB-1" data-look="classic" transform="translate(114.26041412353516, 166.5)"><rect class="basic label-container" style="fill:var(--accent-soft) !important;stroke:var(--accent) !important;stroke-width:1.5px !important" x="-106.26042175292969" y="-41.5" width="212.52084350585938" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-86.26042175292969, -31.5)"><rect></rect><foreignObject width="172.52084350585938" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>U.S. Bank proposal<br/>for TRE18101 · 2018 · 214pp<br/>the answers</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig2-flowchart-Q-3" data-look="classic" transform="translate(517.9580154418945, 49.5)"><rect class="basic label-container" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important" x="-74.203125" y="-31" width="148.40625" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-54.203125, -21)"><rect></rect><foreignObject width="108.40625" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>622 requirements<br/>used as queries</p></span></div></foreignObject></g></g><g class="node default reuse " id="m_fig2-flowchart-IDX-5" data-look="classic" transform="translate(517.9580154418945, 166.5)"><rect class="basic label-container" style="fill:var(--accent-soft) !important;stroke:var(--accent) !important;stroke-width:1.5px !important" x="-106.26042175292969" y="-31" width="212.52084350585938" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-86.26042175292969, -21)"><rect></rect><foreignObject width="172.52084350585938" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>750 chunks · 512 tree nodes<br/>embeddings + index</p></span></div></foreignObject></g></g><g class="node default quiet " id="m_fig2-flowchart-SEARCH-7" data-look="classic" transform="translate(710.5413475036621, 108)"><polygon points="40.32291793823242,0 80.64583587646484,-40.32291793823242 40.32291793823242,-80.64583587646484 0,-40.32291793823242" class="label-container" transform="translate(-39.82291793823242, 40.32291793823242)" style="fill:var(--surface-2) !important;stroke:var(--rule) !important;stroke-width:1px !important"></polygon><g class="label" style="color:var(--ink-soft) !important" transform="translate(-19.822917938232422, -10.5)"><rect></rect><foreignObject width="39.645835876464844" height="21"><div style="color: var(--ink-soft) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink-soft) !important" class="nodeLabel "><p>search</p></span></div></foreignObject></g></g><g class="node default good " id="m_fig2-flowchart-ANS-11" data-look="classic" transform="translate(868.0830154418945, 108)"><rect class="basic label-container" style="fill:var(--ok-soft) !important;stroke:var(--ok) !important;stroke-width:1.5px !important" x="-71.21875" y="-31" width="142.4375" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-51.21875, -21)"><rect></rect><foreignObject width="102.4375" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>evidence<br/>+ page numbers</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="m_fig2-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="m_fig2-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="m_fig2-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--seal)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 15.0980392157%)" stop-opacity="1"></stop></linearGradient></svg>
+  </div>
+
+  <div class="lane">
+    <span class="lane-tag">Plain english</span>
+    <p>
+      The <strong>old proposal is the library</strong> — it gets loaded into the system so
+      it can be searched. The <strong>new RFP is the list of questions</strong> — it is
+      read to work out what to ask, but never added to the library.
+    </p>
+    <p>
+      If you loaded the RFP into the library too, the system would happily "answer" a
+      question by finding the same question written in the RFP. Confident, well-cited,
+      and completely useless.
+    </p>
+  </div>
+
+  <div class="lane tech">
+    <span class="lane-tag">Technical</span>
+    <p>
+      Ingestion writes chunks, embeddings and a tree index into a namespace that retrieval
+      searches. Mining calls the sidecar's <code>ParseDocument</code> to get per-page text
+      and never touches the store. The endpoints reflect this:
+      <code>POST /rfp/mine</code> takes a file path and returns requirements;
+      <code>POST /unstructured/ingest</code> is a different operation entirely.
+    </p>
+  </div>
+
+  <h3>Why this specific pair of documents</h3>
+  <p class="spine">
+    RFPs are published everywhere. <strong>Submitted vendor proposals almost never are</strong>
+    — they are confidential and unindexed. We searched hard and found essentially nothing,
+    until we discovered that the State of Delaware publishes the proposals it receives.
+  </p>
+  <p class="spine">
+    What we got is better than a topical match. U.S. Bank bid <span class="mono">TRE18101-BANKINGSVC</span>
+    in 2018; <span class="mono">TRE25101-BANKINGSVC</span> is the 2025 re-bid of the same
+    contract by the same buyer. Delaware even recycled its questionnaire almost word for
+    word — which is exactly what real buyers do.
+  </p>
+  <div class="note">
+    <b>This is not an approximation of the use case — it <em>is</em> the use case:</b> a
+    vendor re-bidding work it previously won, using its old proposal as the knowledge base.
+  </div>
+</section>
+
+<!-- ══════════════ 4 ══════════════ -->
+<section id="why-grasph" class="reveal">
+  <div class="sec-head"><span class="sec-num">04</span><h2>Why build it inside Grasph</h2></div>
+
+  <div class="lane">
+    <span class="lane-tag">Plain english</span>
+    <p>
+      We could have built this as a standalone tool. We did not, because Grasph already
+      does most of the hard, boring parts: reading PDFs including scanned ones, splitting
+      them sensibly, turning text into something searchable, searching it well, talking to
+      language models, tracking what it all costs.
+    </p>
+    <p>
+      Building those again would take months and produce something worse. What Grasph does
+      <em>not</em> have is anything about RFPs — and that is exactly the part worth our time.
+    </p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>What the product needs</th><th>Grasph already has it?</th></tr></thead>
+      <tbody>
+        <tr><td>Parse PDF/DOCX, OCR, per-page text</td><td><span class="chip acc">reuse</span> sidecar <code>ParseDocument</code></td></tr>
+        <tr><td>Search a document collection well</td><td><span class="chip acc">reuse</span> <code>retrieve_all</code> — hybrid vector + keyword</td></tr>
+        <tr><td>Structured LLM calls with retries</td><td><span class="chip acc">reuse</span> <code>chat_completion_json</code></td></tr>
+        <tr><td>Swap to self-hosted models</td><td><span class="chip ok">config only</span> Ollama / vLLM supported</td></tr>
+        <tr><td>Token and cost tracking</td><td><span class="chip acc">reuse</span> <code>TokenMeter</code></td></tr>
+        <tr><td>Find the requirements in an RFP</td><td><span class="chip sea">build</span> nothing comparable</td></tr>
+        <tr><td>Decide coverage, draft, cite</td><td><span class="chip sea">build</span> nothing comparable</td></tr>
+        <tr><td>Compliance matrix + review state</td><td><span class="chip sea">build</span> nothing comparable</td></tr>
+        <tr><td>Write DOCX / fill XLSX</td><td><span class="chip sea">build</span> nothing exists anywhere in the repo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout amber">
+    <h3>One rule this buys us, worth protecting</h3>
+    <p>
+      Every model call goes through <code>EmbeddingService</code>, which already supports
+      OpenAI, Ollama and vLLM. That means <strong>"can our data go to an external API?"
+      is a configuration question, not a rebuild.</strong> If the answer ever becomes no,
+      we point it at a self-hosted model and carry on.
+    </p>
+    <p>
+      A single direct HTTP call to an API anywhere in our module would quietly forfeit
+      that. It is written into the module docs as a rule that must fail code review.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 5 ══════════════ -->
+<section id="golden" class="reveal">
+  <div class="sec-head"><span class="sec-num">05</span><h2>Phase 0: building a ruler before measuring anything</h2></div>
+
+  <div class="lane">
+    <span class="lane-tag">Plain english</span>
+    <p>
+      Before building the real thing, we spent time answering one question: <strong>how
+      would we know if it works?</strong>
+    </p>
+    <p>
+      It is easy to build something that looks impressive and is quietly wrong. So we
+      built the measuring stick first — a set of requirements taken from the real RFP,
+      each one paired with the page of the real proposal that answers it, or marked as
+      genuinely unanswerable. Then anything we build can be scored against it.
+    </p>
+  </div>
+
+  <h3>How the measuring stick was made</h3>
+
+  <div class="diagram">
+    <span class="cap">Figure 3 — four independent annotators, then a human decision</span>
+    <svg id="m_fig3" width="100%" xmlns="http://www.w3.org/2000/svg" class="flowchart" style="--nat-w:1549px; max-width: 1549.003662109375px;" viewBox="0.000003814697265625 0 1549.003662109375 242.5" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#m_fig3{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;fill:var(--ink);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#m_fig3 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#m_fig3 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#m_fig3 .error-icon{fill:var(--surface-2);}#m_fig3 .error-text{fill:#bfbfbf;stroke:#bfbfbf;}#m_fig3 .edge-thickness-normal{stroke-width:1px;}#m_fig3 .edge-thickness-thick{stroke-width:3.5px;}#m_fig3 .edge-pattern-solid{stroke-dasharray:0;}#m_fig3 .edge-thickness-invisible{stroke-width:0;fill:none;}#m_fig3 .edge-pattern-dashed{stroke-dasharray:3;}#m_fig3 .edge-pattern-dotted{stroke-dasharray:2;}#m_fig3 .marker{fill:var(--rule);stroke:var(--rule);}#m_fig3 .marker.cross{stroke:var(--rule);}#m_fig3 svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;}#m_fig3 p{margin:0;}#m_fig3 .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);}#m_fig3 .cluster-label text{fill:var(--ink);}#m_fig3 .cluster-label span{color:var(--ink);}#m_fig3 .cluster-label span p{background-color:transparent;}#m_fig3 .label text,#m_fig3 span{fill:var(--ink);color:var(--ink);}#m_fig3 .node rect,#m_fig3 .node circle,#m_fig3 .node ellipse,#m_fig3 .node polygon,#m_fig3 .node path{fill:var(--surface);stroke:var(--rule);stroke-width:1px;}#m_fig3 .rough-node .label text,#m_fig3 .node .label text,#m_fig3 .image-shape .label,#m_fig3 .icon-shape .label{text-anchor:middle;}#m_fig3 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#m_fig3 .rough-node .label,#m_fig3 .node .label,#m_fig3 .image-shape .label,#m_fig3 .icon-shape .label{text-align:center;}#m_fig3 .node.clickable{cursor:pointer;}#m_fig3 .root .anchor path{fill:var(--rule)!important;stroke-width:0;stroke:var(--rule);}#m_fig3 .arrowheadPath{fill:var(--rule);}#m_fig3 .edgePath .path{stroke:var(--rule);stroke-width:1px;}#m_fig3 .flowchart-link{stroke:var(--rule);fill:none;}#m_fig3 .edgeLabel{background-color:var(--surface);text-align:center;}#m_fig3 .edgeLabel p{background-color:var(--surface);}#m_fig3 .edgeLabel rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig3 .labelBkg{background-color:rgba(48, 48, 48, 0.5);}#m_fig3 .cluster rect{fill:var(--surface-2);stroke:var(--rule);stroke-width:1px;}#m_fig3 .cluster text{fill:var(--ink);}#m_fig3 .cluster span{color:var(--ink);}#m_fig3 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:12px;background:var(--surface-2);border:1px solid hsl(0, 0%, 15.0980392157%);border-radius:2px;pointer-events:none;z-index:100;}#m_fig3 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:var(--ink);}#m_fig3 rect.text{fill:none;stroke-width:0;}#m_fig3 .icon-shape,#m_fig3 .image-shape{background-color:var(--surface);text-align:center;}#m_fig3 .icon-shape p,#m_fig3 .image-shape p{background-color:var(--surface);padding:2px;}#m_fig3 .icon-shape .label rect,#m_fig3 .image-shape .label rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig3 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#m_fig3 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#m_fig3 .node .neo-node{stroke:var(--rule);}#m_fig3 [data-look="neo"].node rect,#m_fig3 [data-look="neo"].cluster rect,#m_fig3 [data-look="neo"].node polygon{stroke:url(#m_fig3-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig3 [data-look="neo"].swimlane.cluster rect{filter:none;}#m_fig3 [data-look="neo"].node path{stroke:url(#m_fig3-gradient);stroke-width:1px;}#m_fig3 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig3 [data-look="neo"].node .neo-line path{stroke:var(--rule);filter:none;}#m_fig3 [data-look="neo"].node circle{stroke:url(#m_fig3-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig3 [data-look="neo"].node circle .state-start{fill:#000000;}#m_fig3 [data-look="neo"].icon-shape .icon{fill:url(#m_fig3-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig3 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#m_fig3-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig3 :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}#m_fig3 .base rect{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig3 .base polygon{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig3 .base ellipse{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig3 .base circle{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig3 .base path{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig3 .base tspan{fill:var(--ink)!important;}#m_fig3 .reuse rect{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .reuse polygon{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .reuse ellipse{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .reuse circle{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .reuse path{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .reuse tspan{fill:var(--ink)!important;}#m_fig3 .built rect{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .built polygon{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .built ellipse{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .built circle{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .built path{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .built tspan{fill:var(--ink)!important;}#m_fig3 .good rect{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .good polygon{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .good ellipse{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .good circle{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .good path{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .good tspan{fill:var(--ink)!important;}#m_fig3 .bad rect{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .bad polygon{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .bad ellipse{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .bad circle{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .bad path{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig3 .bad tspan{fill:var(--ink)!important;}#m_fig3 .quiet rect{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig3 .quiet polygon{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig3 .quiet ellipse{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig3 .quiet circle{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig3 .quiet path{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig3 .quiet tspan{fill:var(--ink-soft)!important;}</style><g><marker id="m_fig3_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig3_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig3_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig3_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="m_fig3_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig3_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig3_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig3_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig3_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig3_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig3_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="m_fig3_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M118.715,124.5L123.511,121.667C128.307,118.833,137.898,113.167,145.861,110.333C153.823,107.5,160.156,107.5,163.323,107.5L166.49,107.5" id="m_fig3-L_RFP_A_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_RFP_A_0" data-points="W3sieCI6MTE4LjcxNTM4ODM3NzUwNzU0LCJ5IjoxMjQuNX0seyJ4IjoxNDcuNDg5NTg1ODc2NDY0ODQsInkiOjEwNy41fSx7IngiOjE3MC40ODk1ODU4NzY0NjQ4NCwieSI6MTA3LjV9XQ==" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M118.715,186.5L123.511,189.333C128.307,192.167,137.898,197.833,145.945,200.667C153.991,203.5,160.493,203.5,163.744,203.5L166.995,203.5" id="m_fig3-L_RFP_B_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_RFP_B_0" data-points="W3sieCI6MTE4LjcxNTM4ODM3NzUwNzU0LCJ5IjoxODYuNX0seyJ4IjoxNDcuNDg5NTg1ODc2NDY0ODQsInkiOjIwMy41fSx7IngiOjE3MC45OTQ3OTI5MzgyMzI0MiwieSI6MjAzLjV9XQ==" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M286.125,107.5L294.757,107.5C303.388,107.5,320.652,107.5,337.274,109.77C353.896,112.04,369.877,116.58,377.867,118.85L385.857,121.12" id="m_fig3-L_A_REC_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_REC_0" data-points="W3sieCI6Mjg2LjEyNSwieSI6MTA3LjV9LHsieCI6MzM3LjkxNTAzOTA2MjUsInkiOjEwNy41fSx7IngiOjM4OS43MDUwNzgxMjUsInkiOjEyMi4yMTMzNjYzNzIxMTAxMn1d" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M285.62,203.5L294.336,203.5C303.052,203.5,320.483,203.5,337.19,201.23C353.896,198.96,369.877,194.42,377.867,192.15L385.857,189.88" id="m_fig3-L_B_REC_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_REC_0" data-points="W3sieCI6Mjg1LjYxOTc5MjkzODIzMjQsInkiOjIwMy41fSx7IngiOjMzNy45MTUwMzkwNjI1LCJ5IjoyMDMuNX0seyJ4IjozODkuNzA1MDc4MTI1LCJ5IjoxODguNzg2NjMzNjI3ODg5OX1d" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M584.382,37.94L594.825,36.45C605.268,34.96,626.153,31.98,639.863,30.892C653.573,29.805,660.107,30.609,663.374,31.012L666.641,31.414" id="m_fig3-L_KB_C_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_KB_C_0" data-points="W3sieCI6NTg0LjM4MjE1NjM3MjA3MDMsInkiOjM3Ljk0MDI0OTg2NDk0MzM4fSx7IngiOjY0Ny4wMzg0MDYzNzIwNzAzLCJ5IjoyOX0seyJ4Ijo2NzAuNjExMzIwNDk1NjA1NSwieSI6MzEuOTAyNzcwMzgzOTA2Nn1d" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M575.57,80L587.481,85.375C599.393,90.75,623.216,101.5,640.225,110.218C657.234,118.936,667.43,125.621,672.528,128.964L677.626,132.307" id="m_fig3-L_KB_D_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_KB_D_0" data-points="W3sieCI6NTc1LjU3MDAyODIyMjEyNTUsInkiOjgwfSx7IngiOjY0Ny4wMzg0MDYzNzIwNzAzLCJ5IjoxMTIuMjV9LHsieCI6NjgwLjk3MDUyNjM0MTU0MTIsInkiOjEzNC41fV0=" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M598.839,114L606.872,110.375C614.905,106.75,630.972,99.5,644.103,92.532C657.234,85.564,667.43,78.879,672.528,75.536L677.626,72.193" id="m_fig3-L_REC_C_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_REC_C_0" data-points="W3sieCI6NTk4LjgzODgwMjUwMzUwMjgsInkiOjExNH0seyJ4Ijo2NDcuMDM4NDA2MzcyMDcwMywieSI6OTIuMjV9LHsieCI6NjgwLjk3MDUyNjM0MTU0MTIsInkiOjcwfV0=" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M624.038,172.218L627.872,172.765C631.705,173.312,639.372,174.406,646.377,174.562C653.382,174.719,659.725,173.938,662.897,173.547L666.068,173.157" id="m_fig3-L_REC_D_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_REC_D_0" data-points="W3sieCI6NjI0LjAzODQwNjM3MjA3MDMsInkiOjE3Mi4yMTgxOTI1NjgyODAxM30seyJ4Ijo2NDcuMDM4NDA2MzcyMDcwMywieSI6MTc1LjV9LHsieCI6NjcwLjAzODQwNjM3MjA3MDMsInkiOjE3Mi42Njc3NzgzMDM1MjM2fV0=" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M785.882,39L799.157,39C812.431,39,838.98,39,867.169,44.157C895.357,49.314,925.186,59.629,940.1,64.786L955.014,69.943" id="m_fig3-L_C_VER_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_VER_0" data-points="W3sieCI6Nzg1Ljg4MjE1NjM3MjA3MDMsInkiOjM5fSx7IngiOjg2NS41Mjg2MzY5MzIzNzMsInkiOjM5fSx7IngiOjk1OC43OTQ3Nzg1MTQ3NTY2LCJ5Ijo3MS4yNX1d" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M786.455,165.5L799.634,165.5C812.813,165.5,839.171,165.5,867.264,160.343C895.357,155.186,925.186,144.871,940.1,139.714L955.014,134.557" id="m_fig3-L_D_VER_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_VER_0" data-points="W3sieCI6Nzg2LjQ1NTA3MDQ5NTYwNTUsInkiOjE2NS41fSx7IngiOjg2NS41Mjg2MzY5MzIzNzMsInkiOjE2NS41fSx7IngiOjk1OC43OTQ3Nzg1MTQ3NTY2LCJ5IjoxMzMuMjV9XQ==" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path><path d="M1152.29,102.25L1169.787,102.25C1187.284,102.25,1222.278,102.25,1256.605,102.25C1290.932,102.25,1324.593,102.25,1341.423,102.25L1358.254,102.25" id="m_fig3-L_VER_GOLD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_VER_GOLD_0" data-points="W3sieCI6MTE1Mi4yODk3MDMzNjkxNDA2LCJ5IjoxMDIuMjV9LHsieCI6MTI1Ny4yNzE2NDQ1OTIyODUyLCJ5IjoxMDIuMjV9LHsieCI6MTM2Mi4yNTM1ODU4MTU0Mjk3LCJ5IjoxMDIuMjV9XQ==" data-look="classic" marker-end="url(#m_fig3_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_RFP_A_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_RFP_B_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel" transform="translate(337.9150390625, 107.5)"><g class="label" data-id="L_A_REC_0" transform="translate(0.3037109375, -8.000000596046448)"><g><rect class="background" style="" x="-29.09375" y="-3.333333373069763" width="57.580078125" height="22.666667938232422"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">482</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> reqs</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(337.9150390625, 203.5)"><g class="label" data-id="L_B_REC_0" transform="translate(0.3037109375, -8.000000596046448)"><g><rect class="background" style="" x="-29.09375" y="-3.333333373069763" width="57.580078125" height="22.666667938232422"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">468</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> reqs</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_KB_C_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_KB_D_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_REC_C_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_REC_D_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel" transform="translate(865.528636932373, 39)"><g class="label" data-id="L_C_VER_0" transform="translate(-0.005859375, -15.699999451637268)"><g><rect class="background" style="" x="-56.067710876464844" y="-3.333333373069763" width="112.14714050292969" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">verdict</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">+</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> verbatim</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> quote</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(865.528636932373, 165.5)"><g class="label" data-id="L_D_VER_0" transform="translate(-0.005859375, -15.699999451637268)"><g><rect class="background" style="" x="-56.067710876464844" y="-3.333333373069763" width="112.14714050292969" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">verdict</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">+</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> verbatim</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> quote</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(1257.2716445922852, 102.25)"><g class="label" data-id="L_VER_GOLD_0" transform="translate(-0.00276947021484375, -15.699999451637268)"><g><rect class="background" style="" x="-81.97917175292969" y="-3.333333373069763" width="163.96388244628906" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">90%</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> verdict</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> agreement</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">30/31</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> cite</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> SAME</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> page</tspan></tspan></text></g></g></g></g><g class="nodes"><g class="node default quiet " id="m_fig3-flowchart-RFP-0" data-look="classic" transform="translate(66.24479293823242, 155.5)"><rect class="basic label-container" style="fill:var(--surface-2) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-58.24479293823242" y="-31" width="116.48958587646484" height="62"></rect><g class="label" style="color:var(--ink-soft) !important" transform="translate(-38.24479293823242, -21)"><rect></rect><foreignObject width="76.48958587646484" height="42"><div style="color: var(--ink-soft) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink-soft) !important" class="nodeLabel "><p>RFP<br/>pages 19-64</p></span></div></foreignObject></g></g><g class="node default base " id="m_fig3-flowchart-A-1" data-look="classic" transform="translate(228.30729293823242, 107.5)"><rect class="basic label-container" style="fill:var(--surface) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-57.817710876464844" y="-31" width="115.63542175292969" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-37.817710876464844, -21)"><rect></rect><foreignObject width="75.63542175292969" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>Annotator A<br/>model 1</p></span></div></foreignObject></g></g><g class="node default base " id="m_fig3-flowchart-B-3" data-look="classic" transform="translate(228.30729293823242, 203.5)"><rect class="basic label-container" style="fill:var(--surface) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-57.3125" y="-31" width="114.625" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-37.3125, -21)"><rect></rect><foreignObject width="74.625" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>Annotator B<br/>model 2</p></span></div></foreignObject></g></g><g class="node default base " id="m_fig3-flowchart-REC-5" data-look="classic" transform="translate(506.87174224853516, 155.5)"><rect class="basic label-container" style="fill:var(--surface) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-117.16667175292969" y="-41.5" width="234.33334350585938" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-97.16667175292969, -31.5)"><rect></rect><foreignObject width="194.33334350585938" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>reconcile, then sample<br/>94% text · 93% class agreement<br/>50 rows, stratified by section</p></span></div></foreignObject></g></g><g class="node default quiet " id="m_fig3-flowchart-KB-8" data-look="classic" transform="translate(506.87174224853516, 49)"><rect class="basic label-container" style="fill:var(--surface-2) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-77.51041793823242" y="-31" width="155.02083587646484" height="62"></rect><g class="label" style="color:var(--ink-soft) !important" transform="translate(-57.51041793823242, -21)"><rect></rect><foreignObject width="115.02083587646484" height="42"><div style="color: var(--ink-soft) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink-soft) !important" class="nodeLabel "><p>U.S. Bank proposal<br/>214 pages</p></span></div></foreignObject></g></g><g class="node default base " id="m_fig3-flowchart-C-9" data-look="classic" transform="translate(728.2467384338379, 39)"><rect class="basic label-container" style="fill:var(--surface) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-57.63541793823242" y="-31" width="115.27083587646484" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-37.63541793823242, -21)"><rect></rect><foreignObject width="75.27083587646484" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>Annotator C<br/>model 1</p></span></div></foreignObject></g></g><g class="node default base " id="m_fig3-flowchart-D-11" data-look="classic" transform="translate(728.2467384338379, 165.5)"><rect class="basic label-container" style="fill:var(--surface) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-58.208335876464844" y="-31" width="116.41667175292969" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-38.208335876464844, -21)"><rect></rect><foreignObject width="76.41667175292969" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>Annotator D<br/>model 2</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig3-flowchart-VER-17" data-look="classic" transform="translate(1048.4459533691406, 102.25)"><rect class="basic label-container" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important" x="-103.84375" y="-31" width="207.6875" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-83.84375, -21)"><rect></rect><foreignObject width="167.6875" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>machine verification<br/>is the quote ON that page?</p></span></div></foreignObject></g></g><g class="node default good " id="m_fig3-flowchart-GOLD-21" data-look="classic" transform="translate(1451.6285858154297, 102.25)"><rect class="basic label-container" style="fill:var(--ok-soft) !important;stroke:var(--ok) !important;stroke-width:1.5px !important" x="-89.375" y="-41.5" width="178.75" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-69.375, -31.5)"><rect></rect><foreignObject width="138.75" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>50 signed rows<br/>31 answered · 7 partial<br/>12 no-answer</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="m_fig3-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="m_fig3-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="m_fig3-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--seal)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 15.0980392157%)" stop-opacity="1"></stop></linearGradient></svg>
+  </div>
+
+  <div class="lane tech">
+    <span class="lane-tag">Technical — the two rules that make this trustworthy</span>
+    <p>
+      <strong>1. The golden set may not be produced by the system under test.</strong>
+      Requirement recall asks "of the requirements a human finds, how many did the miner
+      find?" If the miner labels the answers, it grades itself and returns a meaningless
+      number near 1.0. All four annotators ran before the production miner existed.
+    </p>
+    <p>
+      <strong>2. Agreement is not verification.</strong> Two models agreeing is a better
+      prior, not proof. Every evidence claim had to carry a <strong>verbatim quote of 40+
+      characters</strong>, and a script checked that the text is literally on the page
+      claimed. Anything not found was discarded regardless of how confident the annotator
+      was or whether both agreed.
+    </p>
+  </div>
+
+  <div class="callout good">
+    <h3>The most valuable rows are the ones with <em>no</em> answer</h3>
+    <p>
+      Twelve of the fifty requirements are verified as <strong>unanswerable</strong> — the
+      proposal simply does not address them. Both annotators independently discovered why:
+      <strong>U.S. Bank never bid the lockbox component.</strong> The pricing and personnel
+      tables both read "Lockbox Services: Not applicable", and the word "lockbox" appears
+      six times in 214 pages, all incidental.
+    </p>
+    <p>
+      Those twelve rows turned out to be the most useful thing in the whole set — see the
+      next section. <strong>A benchmark built only from questions the library can answer
+      would have scored 87% and been declared a success</strong>, while hiding the failure
+      that actually mattered.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 6 ══════════════ -->
+<section id="findings" class="reveal">
+  <div class="sec-head"><span class="sec-num">06</span><h2>Four findings that changed the design</h2></div>
+
+  <h3>Finding 1 — search scores cannot tell "no answer" from "an answer"</h3>
+
+  <div class="lane">
+    <span class="lane-tag">Plain english</span>
+    <p>
+      The obvious way to detect a gap is: if the best search result scores low, there is
+      no answer. We measured whether that works. It does not.
+    </p>
+    <p>
+      The proposal is full of banking content. Ask a lockbox question and the search
+      returns plausible banking text that is <em>about</em> the right topic but does not
+      answer the question. It scores well. There is no cut-off that separates the two.
+    </p>
+  </div>
+
+  <div class="bars" data-bars>
+    <div class="bar-row">
+      <div class="bar-lab"><b>Questions with an answer</b>top score, n=38</div>
+      <div class="bar-tr"><div class="bar-fl ok" data-w="68"></div></div>
+      <div class="bar-val">0.68</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lab"><b>Questions with NO answer</b>top score, n=12</div>
+      <div class="bar-tr"><div class="bar-fl crit" data-w="43"></div></div>
+      <div class="bar-val">0.43</div>
+    </div>
+  </div>
+  <p class="spine" style="font-size:.92rem">
+    Those medians look separable. They are not: the answerable range bottoms out at
+    <strong>0.408</strong> while the unanswerable range tops out at <strong>0.678</strong>.
+    <strong>Six of twelve unanswerable questions score above the lowest genuine answer.</strong>
+  </p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>If we set the cut-off here…</th><th>gaps correctly caught</th><th>real answers destroyed</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0.40</td><td class="num">6 / 12</td><td class="num">0 / 38</td></tr>
+        <tr><td class="num">0.50</td><td class="num">9 / 12</td><td class="num">3 / 38</td></tr>
+        <tr><td class="num">0.65</td><td class="num">11 / 12</td><td class="num">16 / 38</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <h3>What this changed</h3>
+    <p>
+      The prototype had a score threshold doing exactly this job. <strong>It would have
+      caught none of these gaps</strong> — every one scores above it. We removed the
+      concept entirely. <strong>The language model's own judgement decides coverage</strong>,
+      and search scores are diagnostic only.
+    </p>
+    <p>
+      That put the whole safety story on one component, so we measured that component
+      separately before building on it. It refuses <strong>12 out of 12</strong>.
+    </p>
+  </div>
+
+  <h3>Finding 2 — a defect that targets this product specifically</h3>
+
+  <div class="lane">
+    <span class="lane-tag">Plain english</span>
+    <p>
+      Grasph removes near-duplicate search results, which is sensible — nobody wants the
+      same paragraph three times. But it compares only the <em>first ~300 characters</em>,
+      and it does not check whether the two paragraphs came from <em>different documents</em>.
+    </p>
+    <p>
+      A company's proposals all start the same way: same company description, same mission
+      statement, same certifications. So forty different proposals look like duplicates of
+      each other, and the system quietly keeps one and drops the rest.
+    </p>
+  </div>
+
+  <div class="diagram">
+    <span class="cap">Figure 4 — how the same text becomes the wrong citation</span>
+    <svg id="m_fig4" width="100%" xmlns="http://www.w3.org/2000/svg" class="flowchart" style="--nat-w:1371px; max-width: 1371.005615234375px;" viewBox="0.00000762939453125 0 1371.005615234375 216" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#m_fig4{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;fill:var(--ink);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#m_fig4 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#m_fig4 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#m_fig4 .error-icon{fill:var(--surface-2);}#m_fig4 .error-text{fill:#bfbfbf;stroke:#bfbfbf;}#m_fig4 .edge-thickness-normal{stroke-width:1px;}#m_fig4 .edge-thickness-thick{stroke-width:3.5px;}#m_fig4 .edge-pattern-solid{stroke-dasharray:0;}#m_fig4 .edge-thickness-invisible{stroke-width:0;fill:none;}#m_fig4 .edge-pattern-dashed{stroke-dasharray:3;}#m_fig4 .edge-pattern-dotted{stroke-dasharray:2;}#m_fig4 .marker{fill:var(--rule);stroke:var(--rule);}#m_fig4 .marker.cross{stroke:var(--rule);}#m_fig4 svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;}#m_fig4 p{margin:0;}#m_fig4 .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);}#m_fig4 .cluster-label text{fill:var(--ink);}#m_fig4 .cluster-label span{color:var(--ink);}#m_fig4 .cluster-label span p{background-color:transparent;}#m_fig4 .label text,#m_fig4 span{fill:var(--ink);color:var(--ink);}#m_fig4 .node rect,#m_fig4 .node circle,#m_fig4 .node ellipse,#m_fig4 .node polygon,#m_fig4 .node path{fill:var(--surface);stroke:var(--rule);stroke-width:1px;}#m_fig4 .rough-node .label text,#m_fig4 .node .label text,#m_fig4 .image-shape .label,#m_fig4 .icon-shape .label{text-anchor:middle;}#m_fig4 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#m_fig4 .rough-node .label,#m_fig4 .node .label,#m_fig4 .image-shape .label,#m_fig4 .icon-shape .label{text-align:center;}#m_fig4 .node.clickable{cursor:pointer;}#m_fig4 .root .anchor path{fill:var(--rule)!important;stroke-width:0;stroke:var(--rule);}#m_fig4 .arrowheadPath{fill:var(--rule);}#m_fig4 .edgePath .path{stroke:var(--rule);stroke-width:1px;}#m_fig4 .flowchart-link{stroke:var(--rule);fill:none;}#m_fig4 .edgeLabel{background-color:var(--surface);text-align:center;}#m_fig4 .edgeLabel p{background-color:var(--surface);}#m_fig4 .edgeLabel rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig4 .labelBkg{background-color:rgba(48, 48, 48, 0.5);}#m_fig4 .cluster rect{fill:var(--surface-2);stroke:var(--rule);stroke-width:1px;}#m_fig4 .cluster text{fill:var(--ink);}#m_fig4 .cluster span{color:var(--ink);}#m_fig4 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:12px;background:var(--surface-2);border:1px solid hsl(0, 0%, 15.0980392157%);border-radius:2px;pointer-events:none;z-index:100;}#m_fig4 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:var(--ink);}#m_fig4 rect.text{fill:none;stroke-width:0;}#m_fig4 .icon-shape,#m_fig4 .image-shape{background-color:var(--surface);text-align:center;}#m_fig4 .icon-shape p,#m_fig4 .image-shape p{background-color:var(--surface);padding:2px;}#m_fig4 .icon-shape .label rect,#m_fig4 .image-shape .label rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig4 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#m_fig4 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#m_fig4 .node .neo-node{stroke:var(--rule);}#m_fig4 [data-look="neo"].node rect,#m_fig4 [data-look="neo"].cluster rect,#m_fig4 [data-look="neo"].node polygon{stroke:url(#m_fig4-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig4 [data-look="neo"].swimlane.cluster rect{filter:none;}#m_fig4 [data-look="neo"].node path{stroke:url(#m_fig4-gradient);stroke-width:1px;}#m_fig4 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig4 [data-look="neo"].node .neo-line path{stroke:var(--rule);filter:none;}#m_fig4 [data-look="neo"].node circle{stroke:url(#m_fig4-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig4 [data-look="neo"].node circle .state-start{fill:#000000;}#m_fig4 [data-look="neo"].icon-shape .icon{fill:url(#m_fig4-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig4 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#m_fig4-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig4 :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}#m_fig4 .base rect{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig4 .base polygon{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig4 .base ellipse{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig4 .base circle{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig4 .base path{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig4 .base tspan{fill:var(--ink)!important;}#m_fig4 .reuse rect{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .reuse polygon{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .reuse ellipse{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .reuse circle{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .reuse path{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .reuse tspan{fill:var(--ink)!important;}#m_fig4 .built rect{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .built polygon{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .built ellipse{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .built circle{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .built path{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .built tspan{fill:var(--ink)!important;}#m_fig4 .good rect{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .good polygon{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .good ellipse{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .good circle{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .good path{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .good tspan{fill:var(--ink)!important;}#m_fig4 .bad rect{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .bad polygon{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .bad ellipse{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .bad circle{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .bad path{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig4 .bad tspan{fill:var(--ink)!important;}#m_fig4 .quiet rect{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig4 .quiet polygon{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig4 .quiet ellipse{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig4 .quiet circle{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig4 .quiet path{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig4 .quiet tspan{fill:var(--ink-soft)!important;}</style><g><marker id="m_fig4_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig4_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig4_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig4_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="m_fig4_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig4_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig4_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig4_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig4_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig4_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig4_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="m_fig4_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M152.392,77L162.872,72.417C173.352,67.833,194.311,58.667,214.564,54.083C234.818,49.5,254.365,49.5,264.138,49.5L273.911,49.5" id="m_fig4-L_Q_D1_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Q_D1_0" data-points="W3sieCI6MTUyLjM5MjAwMTA5NDk4MTE0LCJ5Ijo3N30seyJ4IjoyMTUuMjcwODI4MjQ3MDcwMywieSI6NDkuNX0seyJ4IjoyNzcuOTExNDUzMjQ3MDcwMywieSI6NDkuNX1d" data-look="classic" marker-end="url(#m_fig4_flowchart-v2-pointEnd)"></path><path d="M152.392,139L162.872,143.583C173.352,148.167,194.311,157.333,214.166,161.917C234.021,166.5,252.771,166.5,262.146,166.5L271.521,166.5" id="m_fig4-L_Q_D2_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Q_D2_0" data-points="W3sieCI6MTUyLjM5MjAwMTA5NDk4MTE0LCJ5IjoxMzl9LHsieCI6MjE1LjI3MDgyODI0NzA3MDMsInkiOjE2Ni41fSx7IngiOjI3NS41MjA4MjgyNDcwNzAzLCJ5IjoxNjYuNX1d" data-look="classic" marker-end="url(#m_fig4_flowchart-v2-pointEnd)"></path><path d="M502.099,49.5L506.331,49.5C510.562,49.5,519.026,49.5,531.507,53.932C543.987,58.363,560.485,67.226,568.734,71.658L576.983,76.09" id="m_fig4-L_D1_CMP_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D1_CMP_0" data-points="W3sieCI6NTAyLjA5ODk1MzI0NzA3MDMsInkiOjQ5LjV9LHsieCI6NTI3LjQ4OTU3ODI0NzA3MDMsInkiOjQ5LjV9LHsieCI6NTgwLjUwNjgwMDMxMzcxODMsInkiOjc3Ljk4Mjc3NzkzMzM1Mn1d" data-look="classic" marker-end="url(#m_fig4_flowchart-v2-pointEnd)"></path><path d="M504.49,166.5L508.323,166.5C512.156,166.5,519.823,166.5,531.905,162.068C543.987,157.637,560.485,148.774,568.734,144.342L576.983,139.91" id="m_fig4-L_D2_CMP_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D2_CMP_0" data-points="W3sieCI6NTA0LjQ4OTU3ODI0NzA3MDMsInkiOjE2Ni41fSx7IngiOjUyNy40ODk1NzgyNDcwNzAzLCJ5IjoxNjYuNX0seyJ4Ijo1ODAuNTA2ODAwMzEzNzE4MywieSI6MTM4LjAxNzIyMjA2NjY0OH1d" data-look="classic" marker-end="url(#m_fig4_flowchart-v2-pointEnd)"></path><path d="M722.271,108L740.323,108C758.374,108,794.478,108,829.914,108C865.351,108,900.121,108,917.506,108L934.891,108" id="m_fig4-L_CMP_KEEP_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CMP_KEEP_0" data-points="W3sieCI6NzIyLjI3MDgyODI0NzA3MDMsInkiOjEwOH0seyJ4Ijo4MzAuNTgwODg2ODQwODIwMywieSI6MTA4fSx7IngiOjkzOC44OTA5NDU0MzQ1NzAzLCJ5IjoxMDh9XQ==" data-look="classic" marker-end="url(#m_fig4_flowchart-v2-pointEnd)"></path><path d="M1077.006,108L1080.839,108C1084.672,108,1092.339,108,1099.339,108C1106.339,108,1112.672,108,1115.839,108L1119.006,108" id="m_fig4-L_KEEP_CITE_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_KEEP_CITE_0" data-points="W3sieCI6MTA3Ny4wMDU1MjM2ODE2NDA2LCJ5IjoxMDh9LHsieCI6MTEwMC4wMDU1MjM2ODE2NDA2LCJ5IjoxMDh9LHsieCI6MTEyMy4wMDU1MjM2ODE2NDA2LCJ5IjoxMDh9XQ==" data-look="classic" marker-end="url(#m_fig4_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(215.2708282470703, 49.5)"><g class="label" data-id="L_Q_D1_0" transform="translate(0, -15.699999451637268)"><g><rect class="background" style="" x="-37.25" y="-3.333333373069763" width="74.5" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">search</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">returns</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> two</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_Q_D2_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_D1_CMP_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_D2_CMP_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel" transform="translate(830.5808868408203, 108)"><g class="label" data-id="L_CMP_KEEP_0" transform="translate(-0.23193359375, -15.699999451637268)"><g><rect class="background" style="" x="-85.078125" y="-3.333333373069763" width="170.6201171875" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">keeps</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> one,</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> drops</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> other</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">NO</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> same-document</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> check</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_KEEP_CITE_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g></g><g class="nodes"><g class="node default quiet " id="m_fig4-flowchart-Q-0" data-look="classic" transform="translate(81.51041412353516, 108)"><rect class="basic label-container" style="fill:var(--surface-2) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-73.51041793823242" y="-31" width="147.02083587646484" height="62"></rect><g class="label" style="color:var(--ink-soft) !important" transform="translate(-53.51041793823242, -21)"><rect></rect><foreignObject width="107.02083587646484" height="42"><div style="color: var(--ink-soft) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink-soft) !important" class="nodeLabel "><p>Question about a<br/>MARYLAND bid</p></span></div></foreignObject></g></g><g class="node default base " id="m_fig4-flowchart-D1-1" data-look="classic" transform="translate(390.0052032470703, 49.5)"><rect class="basic label-container" style="fill:var(--surface) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-112.09375" y="-41.5" width="224.1875" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-92.09375, -31.5)"><rect></rect><foreignObject width="184.1875" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>from the DELAWARE proposal<br/>'…managers support<br/>the State of Delaware…'</p></span></div></foreignObject></g></g><g class="node default base " id="m_fig4-flowchart-D2-3" data-look="classic" transform="translate(390.0052032470703, 166.5)"><rect class="basic label-container" style="fill:var(--surface) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-114.484375" y="-41.5" width="228.96875" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-94.484375, -31.5)"><rect></rect><foreignObject width="188.96875" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>from the MARYLAND proposal<br/>'…managers support<br/>the State of Maryland…'</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig4-flowchart-CMP-5" data-look="classic" transform="translate(636.3802032470703, 108)"><polygon points="85.890625,0 171.78125,-85.890625 85.890625,-171.78125 0,-85.890625" class="label-container" transform="translate(-85.390625, 85.890625)" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important"></polygon><g class="label" style="color:var(--ink) !important" transform="translate(-54.890625, -21)"><rect></rect><foreignObject width="109.78125" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>95% similar in<br/>the first 300 chars</p></span></div></foreignObject></g></g><g class="node default bad " id="m_fig4-flowchart-KEEP-9" data-look="classic" transform="translate(1007.9482345581055, 108)"><rect class="basic label-container" style="fill:var(--crit-soft) !important;stroke:var(--crit) !important;stroke-width:1.5px !important" x="-69.05729293823242" y="-31" width="138.11458587646484" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-49.05729293823242, -21)"><rect></rect><foreignObject width="98.11458587646484" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>Delaware chunk<br/>survives</p></span></div></foreignObject></g></g><g class="node default bad " id="m_fig4-flowchart-CITE-11" data-look="classic" transform="translate(1243.0055236816406, 108)"><rect class="basic label-container" style="fill:var(--crit-soft) !important;stroke:var(--crit) !important;stroke-width:1.5px !important" x="-120" y="-52" width="240" height="104"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-100, -42)"><rect></rect><foreignObject width="200" height="84"><div style="color: var(--ink) !important; display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>Answer for MARYLAND,<br/>cited to the DELAWARE proposal<br/>internally valid, wrong client</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="m_fig4-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="m_fig4-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="m_fig4-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--seal)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 15.0980392157%)" stop-opacity="1"></stop></linearGradient></svg>
+  </div>
+
+  <div class="callout">
+    <h3>We measured it on documents we already had</h3>
+    <p>
+      Two versions of the same Delaware RFP: <strong>1029 of 1053 text chunks (98%) have a
+      near-identical twin.</strong> The platform team measured 43% on a pair of annual
+      reports and called it their dominant bug. A proposal library is a far worse case.
+    </p>
+    <p>
+      <strong>It also hits the RFP side.</strong> Amended RFPs are near-identical to their
+      originals by definition — so an addendum collapses into the original document, and
+      the amendment silently disappears.
+    </p>
+    <p>
+      We reproduced it as failing tests in the platform's own test suite, marked so they do
+      not break anyone's build. The fix is small and the platform team wanted a failing
+      test first — this is a good thing for us to contribute.
+    </p>
+  </div>
+
+  <h3>Finding 3 — the same model, the same words, a weaker rule</h3>
+
+  <div class="lane tech">
+    <span class="lane-tag">Technical</span>
+    <p>
+      We validated a safety rule — <em>an excerpt from a service the vendor never bid does
+      not answer a question about that service</em> — in a test harness. It held 12/12
+      across three runs.
+    </p>
+    <p>
+      Ported into the product with <strong>identical wording</strong>, it failed: a
+      lockbox question was answered from general-banking text. The cause is structural.
+      <code>chat_completion_json</code> sends everything as a single <code>user</code>
+      message — <strong>there is no system role on any provider</strong> — while the harness
+      used a system/user split, where behavioural instructions carry more weight.
+    </p>
+    <p>
+      Worse, it had appeared to pass an earlier run only because that response was
+      <strong>truncated</strong> and fell to an error path. Two unrelated defects cancelled
+      into a green result. Fixing the token limit for unrelated reasons is the only reason
+      we found it.
+    </p>
+  </div>
+
+  <div class="note">
+    <b>Raised, not silently patched.</b> That method is shared with the ingestion
+    extractor, so changing it is not ours to do alone. It is written up in
+    <span class="mono">docs/audits/</span> for whoever owns it, with a suggested additive
+    method that leaves existing callers untouched.
+  </div>
+
+  <h3>Finding 4 — a language model quietly under-classifies money</h3>
+
+  <div class="lane">
+    <span class="lane-tag">Plain english</span>
+    <p>
+      When two annotators disagreed about what kind of requirement something was,
+      <strong>31 of 33 disagreements ran the same direction</strong> — toward the generic
+      "technical" category. And 18 of those were the dangerous kind: one said "a human must
+      write this", the other said "the system can draft it".
+    </p>
+  </div>
+
+  <div class="example">
+    <span class="label">Classified "technical" by a capable model</span>
+    <em>"What fees or costs would be charged by your Firm when using a smart safe for
+    currency deposits?"</em>
+  </div>
+
+  <p class="spine">
+    That is unambiguously a pricing question. Labelled technical, the system would draft an
+    answer about fees. We saw the same effect again later in production code with a
+    different model and a different prompt — which makes it <strong>a property of the task,
+    not of one setup</strong>.
+  </p>
+
+  <div class="callout good">
+    <h3>The fix: never trust one signal</h3>
+    <p>
+      A requirement goes to a human if <strong>either</strong> the model classified it as
+      commercial/legal <strong>or</strong> the text contains a commercial marker (fee, rate,
+      insurance, certification, indemnity…). Not both — either.
+    </p>
+    <p>
+      The two mistakes cost wildly different amounts. A technical item wrongly sent to a
+      person costs a few minutes of review. <strong>A pricing item wrongly auto-drafted puts
+      an invented number in a bid.</strong> We bias hard toward the cheap error, deliberately.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 7 ══════════════ -->
+<section id="built" class="reveal">
+  <div class="sec-head"><span class="sec-num">07</span><h2>Phase 3: what we built</h2></div>
+
+  <p class="lede spine">
+    A new module inside the Grasph server. Every rule below exists because something was
+    measured, not because it seemed sensible.
+  </p>
+
+  <div class="diagram">
+    <span class="cap">Figure 5 — answering one requirement, with each safeguard in place</span>
+    <svg id="m_fig5" width="100%" xmlns="http://www.w3.org/2000/svg" class="flowchart" style="--nat-w:1383px; max-width: 1382.5765380859375px;" viewBox="0 0 1382.5765380859375 301.5" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#m_fig5{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;fill:var(--ink);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#m_fig5 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#m_fig5 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#m_fig5 .error-icon{fill:var(--surface-2);}#m_fig5 .error-text{fill:#bfbfbf;stroke:#bfbfbf;}#m_fig5 .edge-thickness-normal{stroke-width:1px;}#m_fig5 .edge-thickness-thick{stroke-width:3.5px;}#m_fig5 .edge-pattern-solid{stroke-dasharray:0;}#m_fig5 .edge-thickness-invisible{stroke-width:0;fill:none;}#m_fig5 .edge-pattern-dashed{stroke-dasharray:3;}#m_fig5 .edge-pattern-dotted{stroke-dasharray:2;}#m_fig5 .marker{fill:var(--rule);stroke:var(--rule);}#m_fig5 .marker.cross{stroke:var(--rule);}#m_fig5 svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;}#m_fig5 p{margin:0;}#m_fig5 .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);}#m_fig5 .cluster-label text{fill:var(--ink);}#m_fig5 .cluster-label span{color:var(--ink);}#m_fig5 .cluster-label span p{background-color:transparent;}#m_fig5 .label text,#m_fig5 span{fill:var(--ink);color:var(--ink);}#m_fig5 .node rect,#m_fig5 .node circle,#m_fig5 .node ellipse,#m_fig5 .node polygon,#m_fig5 .node path{fill:var(--surface);stroke:var(--rule);stroke-width:1px;}#m_fig5 .rough-node .label text,#m_fig5 .node .label text,#m_fig5 .image-shape .label,#m_fig5 .icon-shape .label{text-anchor:middle;}#m_fig5 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#m_fig5 .rough-node .label,#m_fig5 .node .label,#m_fig5 .image-shape .label,#m_fig5 .icon-shape .label{text-align:center;}#m_fig5 .node.clickable{cursor:pointer;}#m_fig5 .root .anchor path{fill:var(--rule)!important;stroke-width:0;stroke:var(--rule);}#m_fig5 .arrowheadPath{fill:var(--rule);}#m_fig5 .edgePath .path{stroke:var(--rule);stroke-width:1px;}#m_fig5 .flowchart-link{stroke:var(--rule);fill:none;}#m_fig5 .edgeLabel{background-color:var(--surface);text-align:center;}#m_fig5 .edgeLabel p{background-color:var(--surface);}#m_fig5 .edgeLabel rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig5 .labelBkg{background-color:rgba(48, 48, 48, 0.5);}#m_fig5 .cluster rect{fill:var(--surface-2);stroke:var(--rule);stroke-width:1px;}#m_fig5 .cluster text{fill:var(--ink);}#m_fig5 .cluster span{color:var(--ink);}#m_fig5 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:12px;background:var(--surface-2);border:1px solid hsl(0, 0%, 15.0980392157%);border-radius:2px;pointer-events:none;z-index:100;}#m_fig5 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:var(--ink);}#m_fig5 rect.text{fill:none;stroke-width:0;}#m_fig5 .icon-shape,#m_fig5 .image-shape{background-color:var(--surface);text-align:center;}#m_fig5 .icon-shape p,#m_fig5 .image-shape p{background-color:var(--surface);padding:2px;}#m_fig5 .icon-shape .label rect,#m_fig5 .image-shape .label rect{opacity:0.5;background-color:var(--surface);fill:var(--surface);}#m_fig5 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#m_fig5 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#m_fig5 .node .neo-node{stroke:var(--rule);}#m_fig5 [data-look="neo"].node rect,#m_fig5 [data-look="neo"].cluster rect,#m_fig5 [data-look="neo"].node polygon{stroke:url(#m_fig5-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig5 [data-look="neo"].swimlane.cluster rect{filter:none;}#m_fig5 [data-look="neo"].node path{stroke:url(#m_fig5-gradient);stroke-width:1px;}#m_fig5 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig5 [data-look="neo"].node .neo-line path{stroke:var(--rule);filter:none;}#m_fig5 [data-look="neo"].node circle{stroke:url(#m_fig5-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig5 [data-look="neo"].node circle .state-start{fill:#000000;}#m_fig5 [data-look="neo"].icon-shape .icon{fill:url(#m_fig5-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig5 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#m_fig5-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#m_fig5 :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}#m_fig5 .base rect{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig5 .base polygon{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig5 .base ellipse{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig5 .base circle{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig5 .base path{fill:var(--surface)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink)!important;}#m_fig5 .base tspan{fill:var(--ink)!important;}#m_fig5 .reuse rect{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .reuse polygon{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .reuse ellipse{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .reuse circle{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .reuse path{fill:var(--accent-soft)!important;stroke:var(--accent)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .reuse tspan{fill:var(--ink)!important;}#m_fig5 .built rect{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .built polygon{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .built ellipse{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .built circle{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .built path{fill:var(--seal-soft)!important;stroke:var(--seal)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .built tspan{fill:var(--ink)!important;}#m_fig5 .good rect{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .good polygon{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .good ellipse{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .good circle{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .good path{fill:var(--ok-soft)!important;stroke:var(--ok)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .good tspan{fill:var(--ink)!important;}#m_fig5 .bad rect{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .bad polygon{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .bad ellipse{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .bad circle{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .bad path{fill:var(--crit-soft)!important;stroke:var(--crit)!important;stroke-width:1.5px!important;color:var(--ink)!important;}#m_fig5 .bad tspan{fill:var(--ink)!important;}#m_fig5 .quiet rect{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig5 .quiet polygon{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig5 .quiet ellipse{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig5 .quiet circle{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig5 .quiet path{fill:var(--surface-2)!important;stroke:var(--rule)!important;stroke-width:1px!important;color:var(--ink-soft)!important;}#m_fig5 .quiet tspan{fill:var(--ink-soft)!important;}</style><g><marker id="m_fig5_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig5_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig5_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig5_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="m_fig5_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig5_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig5_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig5_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="m_fig5_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig5_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="m_fig5_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="m_fig5_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M150.198,108L154.031,108C157.865,108,165.531,108,172.531,108C179.531,108,185.865,108,189.031,108L192.198,108" id="m_fig5-L_IN_ROUTE_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_IN_ROUTE_0" data-points="W3sieCI6MTUwLjE5NzkyMTc1MjkyOTcsInkiOjEwOH0seyJ4IjoxNzMuMTk3OTIxNzUyOTI5NywieSI6MTA4fSx7IngiOjE5Ni4xOTc5MjE3NTI5Mjk2NiwieSI6MTA3Ljk5OTk5OTk5OTk5OTk5fV0=" data-look="classic" marker-end="url(#m_fig5_flowchart-v2-pointEnd)"></path><path d="M358.715,80.684L371.577,75.487C384.439,70.289,410.163,59.895,439.673,54.697C469.183,49.5,502.479,49.5,519.127,49.5L535.774,49.5" id="m_fig5-L_ROUTE_H_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_ROUTE_H_0" data-points="W3sieCI6MzU4LjcxNTExNjgzOTAxNDUsInkiOjgwLjY4Mzg1MTU4MDIyNTQ0fSx7IngiOjQzNS44ODcyMjIyOTAwMzkwNiwieSI6NDkuNX0seyJ4Ijo1MzkuNzc0NDMzMTM1OTg2MywieSI6NDkuNX1d" data-look="classic" marker-end="url(#m_fig5_flowchart-v2-pointEnd)"></path><path d="M358.715,135.316L371.577,140.513C384.439,145.711,410.163,156.105,430.668,161.303C451.173,166.5,466.458,166.5,474.101,166.5L481.743,166.5" id="m_fig5-L_ROUTE_RET_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_ROUTE_RET_0" data-points="W3sieCI6MzU4LjcxNTExNjgzOTAxNDUsInkiOjEzNS4zMTYxNDg0MTk3NzQ1NX0seyJ4Ijo0MzUuODg3MjIyMjkwMDM5MDYsInkiOjE2Ni41fSx7IngiOjQ4NS43NDMxNzkzMjEyODkwNiwieSI6MTY2LjV9XQ==" data-look="classic" marker-end="url(#m_fig5_flowchart-v2-pointEnd)"></path><path d="M717.191,166.5L721.024,166.5C724.858,166.5,732.524,166.5,739.524,166.5C746.524,166.5,752.858,166.5,756.024,166.5L759.191,166.5" id="m_fig5-L_RET_LLM_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_RET_LLM_0" data-points="W3sieCI6NzE3LjE5MTEwMTA3NDIxODgsInkiOjE2Ni41fSx7IngiOjc0MC4xOTExMDEwNzQyMTg4LCJ5IjoxNjYuNX0seyJ4Ijo3NjMuMTkxMTAxMDc0MjE4OCwieSI6MTY2LjV9XQ==" data-look="classic" marker-end="url(#m_fig5_flowchart-v2-pointEnd)"></path><path d="M924.097,166.5L927.931,166.5C931.764,166.5,939.431,166.5,946.431,166.5C953.431,166.5,959.764,166.5,962.931,166.5L966.097,166.5" id="m_fig5-L_LLM_CHK_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_LLM_CHK_0" data-points="W3sieCI6OTI0LjA5NzM1MTA3NDIxODgsInkiOjE2Ni41fSx7IngiOjk0Ny4wOTczNTEwNzQyMTg4LCJ5IjoxNjYuNX0seyJ4Ijo5NzAuMDk3MzUxMDc0MjE4OCwieSI6MTY2LjV9XQ==" data-look="classic" marker-end="url(#m_fig5_flowchart-v2-pointEnd)"></path><path d="M1093.131,133.492L1107.447,122.993C1121.764,112.494,1150.397,91.497,1172.862,80.999C1195.327,70.5,1211.623,70.5,1219.772,70.5L1227.92,70.5" id="m_fig5-L_CHK_FLAG_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CHK_FLAG_0" data-points="W3sieCI6MTA5My4xMzA1NTI2ODUzMDg5LCJ5IjoxMzMuNDkxNTI5ODU4MTYwNTN9LHsieCI6MTE3OS4wMjk2NDk3MzQ0OTcsInkiOjcwLjV9LHsieCI6MTIzMS45MjAyNzY2NDE4NDU3LCJ5Ijo3MC41fV0=" data-look="classic" marker-end="url(#m_fig5_flowchart-v2-pointEnd)"></path><path d="M1126.139,166.5L1134.954,166.5C1143.769,166.5,1161.399,166.5,1181.448,166.5C1201.497,166.5,1223.964,166.5,1235.197,166.5L1246.431,166.5" id="m_fig5-L_CHK_ROW_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CHK_ROW_0" data-points="W3sieCI6MTEyNi4xMzkwMjI4MjcxNDg3LCJ5IjoxNjYuNX0seyJ4IjoxMTc5LjAyOTY0OTczNDQ5NywieSI6MTY2LjV9LHsieCI6MTI1MC40MzA2OTQ1ODAwNzgxLCJ5IjoxNjYuNX1d" data-look="classic" marker-end="url(#m_fig5_flowchart-v2-pointEnd)"></path><path d="M1093.131,199.508L1107.447,210.007C1121.764,220.506,1150.397,241.503,1174.052,252.001C1197.707,262.5,1216.384,262.5,1225.722,262.5L1235.061,262.5" id="m_fig5-L_CHK_GAPROW_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CHK_GAPROW_0" data-points="W3sieCI6MTA5My4xMzA1NTI2ODUzMDg5LCJ5IjoxOTkuNTA4NDcwMTQxODM5NDd9LHsieCI6MTE3OS4wMjk2NDk3MzQ0OTcsInkiOjI2Mi41fSx7IngiOjEyMzkuMDYwOTAxNjQxODQ1NywieSI6MjYyLjV9XQ==" data-look="classic" marker-end="url(#m_fig5_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_IN_ROUTE_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel" transform="translate(435.88722229003906, 49.5)"><g class="label" data-id="L_ROUTE_H_0" transform="translate(-0.02783203125, -15.699999451637268)"><g><rect class="background" style="" x="-26.828125" y="-3.333333373069763" width="53.7119140625" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">either</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">says</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> yes</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(435.88722229003906, 166.5)"><g class="label" data-id="L_ROUTE_RET_0" transform="translate(0, -8.000000596046448)"><g><rect class="background" style="" x="-10.067708969116211" y="-3.333333373069763" width="20.135417938232422" height="22.666667938232422"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">no</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_RET_LLM_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel"><g class="label" data-id="L_LLM_CHK_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"></tspan></text></g></g><g><rect class="background" style="stroke: none"></rect></g><g class="edgeLabel" transform="translate(1179.029649734497, 70.5)"><g class="label" data-id="L_CHK_FLAG_0" transform="translate(0, -8.000000596046448)"><g><rect class="background" style="" x="-10.067708969116211" y="-3.333333373069763" width="20.135417938232422" height="22.666667938232422"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">no</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(1179.029649734497, 166.5)"><g class="label" data-id="L_CHK_ROW_0" transform="translate(-0.0000019073486328125, -15.699999451637268)"><g><rect class="background" style="" x="-29.890625" y="-3.333333373069763" width="59.781253814697266" height="38.06666564941406"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">covered</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">or</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> partial</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(1179.029649734497, 262.5)"><g class="label" data-id="L_CHK_GAPROW_0" transform="translate(0, -8.000000596046448)"><g><rect class="background" style="" x="-13.802083969116211" y="-3.333333373069763" width="27.604167938232422" height="22.666667938232422"></rect><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">gap</tspan></tspan></text></g></g></g></g><g class="nodes"><g class="node default quiet " id="m_fig5-flowchart-IN-0" data-look="classic" transform="translate(79.09896087646484, 108)"><rect class="basic label-container" style="fill:var(--surface-2) !important;stroke:var(--rule) !important;stroke-width:1px !important" x="-71.09896087646484" y="-31" width="142.1979217529297" height="62"></rect><g class="label" style="color:var(--ink-soft) !important" transform="translate(-51.098960876464844, -21)"><rect></rect><foreignObject width="102.19792175292969" height="42"><div style="color: var(--ink-soft) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink-soft) !important" class="nodeLabel "><p>requirement<br/>+ its RFP section</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig5-flowchart-ROUTE-1" data-look="classic" transform="translate(291.1145935058594, 108)"><polygon points="94.91666793823242,0 189.83333587646484,-94.91666793823242 94.91666793823242,-189.83333587646484 0,-94.91666793823242" class="label-container" transform="translate(-94.41666793823242, 94.91666793823242)" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important"></polygon><g class="label" style="color:var(--ink) !important" transform="translate(-63.91666793823242, -21)"><rect></rect><foreignObject width="127.83333587646484" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>commercial or legal?<br/>model OR word-list</p></span></div></foreignObject></g></g><g class="node default bad " id="m_fig5-flowchart-H-3" data-look="classic" transform="translate(601.4671401977539, 49.5)"><rect class="basic label-container" style="fill:var(--crit-soft) !important;stroke:var(--crit) !important;stroke-width:1.5px !important" x="-61.692710876464844" y="-41.5" width="123.38542175292969" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-41.692710876464844, -31.5)"><rect></rect><foreignObject width="83.38542175292969" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>human<br/>no retrieval<br/>no model call</p></span></div></foreignObject></g></g><g class="node default reuse " id="m_fig5-flowchart-RET-5" data-look="classic" transform="translate(601.4671401977539, 166.5)"><rect class="basic label-container" style="fill:var(--accent-soft) !important;stroke:var(--accent) !important;stroke-width:1.5px !important" x="-115.72396087646484" y="-41.5" width="231.4479217529297" height="83"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-95.72396087646484, -31.5)"><rect></rect><foreignObject width="191.4479217529297" height="63"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>retrieve_all · top 8<br/>drop what has no document<br/>read FULL text, not the preview</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig5-flowchart-LLM-7" data-look="classic" transform="translate(843.6442260742188, 166.5)"><rect class="basic label-container" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important" x="-80.453125" y="-31" width="160.90625" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-60.453125, -21)"><rect></rect><foreignObject width="120.90625" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>one model call<br/>judge + draft + cite</p></span></div></foreignObject></g></g><g class="node default built " id="m_fig5-flowchart-CHK-9" data-look="classic" transform="translate(1048.1181869506836, 166.5)"><polygon points="78.02083587646484,0 156.0416717529297,-78.02083587646484 78.02083587646484,-156.0416717529297 0,-78.02083587646484" class="label-container" transform="translate(-77.52083587646484, 78.02083587646484)" style="fill:var(--seal-soft) !important;stroke:var(--seal) !important;stroke-width:1.5px !important"></polygon><g class="label" style="color:var(--ink) !important" transform="translate(-47.020835876464844, -21)"><rect></rect><foreignObject width="94.04167175292969" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>cited only what<br/>it was shown?</p></span></div></foreignObject></g></g><g class="node default bad " id="m_fig5-flowchart-FLAG-11" data-look="classic" transform="translate(1303.2484016418457, 70.5)"><rect class="basic label-container" style="fill:var(--crit-soft) !important;stroke:var(--crit) !important;stroke-width:1.5px !important" x="-71.328125" y="-31" width="142.65625" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-51.328125, -21)"><rect></rect><foreignObject width="102.65625" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>flag for a person<br/>grounding failed</p></span></div></foreignObject></g></g><g class="node default good " id="m_fig5-flowchart-ROW-13" data-look="classic" transform="translate(1303.2484016418457, 166.5)"><rect class="basic label-container" style="fill:var(--ok-soft) !important;stroke:var(--ok) !important;stroke-width:1.5px !important" x="-52.817710876464844" y="-31" width="105.63542175292969" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-32.817710876464844, -21)"><rect></rect><foreignObject width="65.63542175292969" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>matrix row<br/>+ citations</p></span></div></foreignObject></g></g><g class="node default bad " id="m_fig5-flowchart-GAPROW-15" data-look="classic" transform="translate(1303.2484016418457, 262.5)"><rect class="basic label-container" style="fill:var(--crit-soft) !important;stroke:var(--crit) !important;stroke-width:1.5px !important" x="-64.1875" y="-31" width="128.375" height="62"></rect><g class="label" style="color:var(--ink) !important" transform="translate(-44.1875, -21)"><rect></rect><foreignObject width="88.375" height="42"><div style="color: var(--ink) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:var(--ink) !important" class="nodeLabel "><p>matrix row<br/>an honest gap</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="m_fig5-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="m_fig5-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="m_fig5-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--seal)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 15.0980392157%)" stop-opacity="1"></stop></linearGradient></svg>
+  </div>
+
+  <h3>The four pieces</h3>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Piece</th><th>What it does</th><th>The decision inside it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>routing.rs</code></td>
+          <td>Decides if a person must write this</td>
+          <td>Union of model verdict and word-list. Runs <em>before</em> retrieval, so a pricing item can never reach the drafter.</td>
+        </tr>
+        <tr>
+          <td><code>answer.rs</code></td>
+          <td>Retrieve, judge, draft or refuse</td>
+          <td>No score threshold at all. Citations validated against what the model actually saw. Failures degrade toward a person, never toward a confident answer.</td>
+        </tr>
+        <tr>
+          <td><code>store.rs</code></td>
+          <td>Saves projects, requirements, matrix rows</td>
+          <td>Tenant name is part of the storage key, so one customer's data is physically a separate range — not a filter applied afterwards.</td>
+        </tr>
+        <tr>
+          <td><code>mining.rs</code></td>
+          <td>Finds the requirements in an RFP</td>
+          <td>Page-sized windows with overlap, no global cap, whole document scanned rather than a guessed region.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Why mining had to be rebuilt from scratch</h3>
+
+  <div class="lane">
+    <span class="lane-tag">Plain english</span>
+    <p>
+      The prototype stopped after finding 80 requirements. <strong>This RFP contains 622.</strong>
+      So no matter how good it was, it could never find more than about an eighth of them —
+      the limit was arithmetic, not quality.
+    </p>
+  </div>
+
+  <div class="bars" data-bars>
+    <div class="bar-row">
+      <div class="bar-lab"><b>Prototype ceiling</b>hard cap at 80</div>
+      <div class="bar-tr"><div class="bar-fl crit" data-w="13"></div></div>
+      <div class="bar-val">~13%</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lab"><b>What we built</b>measured recall</div>
+      <div class="bar-tr"><div class="bar-fl ok" data-w="87.5"></div></div>
+      <div class="bar-val">87.5%</div>
+    </div>
+  </div>
+
+  <div class="lane tech">
+    <span class="lane-tag">Technical</span>
+    <p>
+      Windows are <strong>pages, not character offsets</strong> — pages carry provenance for
+      free, so every requirement can cite where it came from. One page of overlap, because
+      numbered items and their sub-bullets straddle page breaks (both annotators reported
+      this independently). A per-window bound of 120 stops a runaway response; there is
+      <strong>no global cap</strong>, because a global cap silently truncates and that is
+      the exact bug being fixed.
+    </p>
+    <p>
+      The whole document is scanned. We know this RFP's questionnaire ends at page 64 — but
+      that is a fact about <em>one document</em>, discovered by a human reading it.
+      Hardcoding it would fit the code to a single corpus.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 8 ══════════════ -->
+<section id="results" class="reveal">
+  <div class="sec-head"><span class="sec-num">08</span><h2>What it measures</h2></div>
+
+  <div class="tiles">
+    <div class="tile"><span class="v ok" data-count="12">12/12</span><span class="k"><b>unanswerable questions correctly refused</b> — the safety number</span></div>
+    <div class="tile"><span class="v acc">8/38</span><span class="k">answerable ones wrongly refused <b>(better than the reference)</b></span></div>
+    <div class="tile"><span class="v ok">0</span><span class="k">invalid citations across every run</span></div>
+    <div class="tile"><span class="v acc">87.5%</span><span class="k">requirement recall vs <b>622 human annotations</b></span></div>
+    <div class="tile"><span class="v acc">0.868</span><span class="k">page recall@3 — the right page reaches the reader</span></div>
+    <div class="tile"><span class="v sea">~99.8%</span><span class="k">content coverage — see the note below</span></div>
+  </div>
+
+  <div class="callout good">
+    <h3>Two honest numbers for mining, not one</h3>
+    <p>
+      Recall is <strong>87.5%</strong> against human annotation. But when we checked each of
+      the 78 "missed" requirements against what the miner actually produced on the same page:
+      <strong>34 were present but grouped differently, 43 partially present, and exactly one
+      was genuinely not extracted.</strong>
+    </p>
+    <p>
+      So <strong>87.5% is agreement with human segmentation</strong> — the right figure for a
+      compliance matrix, where each row is a discrete thing a person must answer. And
+      <strong>~99.8% is content coverage</strong> — the document was read. Both are true;
+      they answer different questions. The annotators themselves split differently from each
+      other (482 vs 468 entries from identical pages), so perfect boundary agreement was
+      never realistic.
+    </p>
+  </div>
+
+  <h3>Where it is weakest, stated plainly</h3>
+  <div class="callout amber">
+    <p>
+      <strong>Five of 82 commercial requirements are not caught by either signal</strong> —
+      neither the model nor the word list flags them, so they would be auto-drafted. Two carry
+      real pricing signals we miss ("free access", "annual minimum"); two read as policy
+      questions the annotators judged commercial, where reasonable people would disagree.
+    </p>
+    <p>
+      The harm is narrower than it first sounds: grounding still prevents invention, so the
+      exposure is <strong>unflagged stale fee content</strong> — a 2018 fee answer presented
+      without the pricing flag that would make a reviewer look twice. It is recorded as
+      measured residual risk rather than chased, because <strong>both safety rules here have
+      already over-fired when strengthened without measuring what they catch.</strong>
+    </p>
+  </div>
+
+  <h3>Cost, measured rather than guessed</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Operation</th><th>Measured</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Answer one requirement</td><td class="num">~1.6 s</td><td>fractions of a cent</td></tr>
+        <tr><td><b>Read a 127-page RFP</b> (63 calls)</td><td class="num"><b>$0.84</b></td><td>126,947 in + 52,182 out tokens</td></tr>
+        <tr><td>Ingest the 214-page proposal</td><td class="num">$6.98</td><td>31 min on GPT-4o</td></tr>
+        <tr><td>…same ingest on the cheaper model</td><td class="num">$0.42</td><td><b>16× difference</b> — a real decision before loading a library</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <b>Two things we only learned by instrumenting it.</b> The mining figure had been
+    <em>estimated</em> at $1.30 from window sizes — the measured number is <b>$0.84</b>, so
+    the estimate was 55% high. And the prompt cache hit rate on mining is <b>zero</b>, where
+    ingestion achieves ~65%: every window sends a fresh prompt, so nothing is reused. That is
+    a concrete, unclaimed saving worth roughly half the input cost.
+  </div>
+  <div class="note">
+    <b>Mining is not perfectly repeatable.</b> Two runs of the same document produced 740 and
+    734 requirements — about 1% variance at temperature zero. Small, but it means a single run
+    is not a baseline, and any future comparison needs a variance band rather than one number.
+  </div>
+</section>
+
+<!-- ══════════════ 9 ══════════════ -->
+<section id="bugs" class="reveal">
+  <div class="sec-head"><span class="sec-num">09</span><h2>The bugs, and why they were invisible</h2></div>
+
+  <p class="lede spine">
+    This is the part most worth reading, because it is the part that generalises. Every
+    significant bug in this project <strong>compiled cleanly and passed its unit tests</strong>.
+  </p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Bug</th><th>What the code said</th><th>What was true</th><th>Found by</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Word matching</td>
+          <td>markers are broad, which is the safe direction</td>
+          <td><code>rate</code> matched inside "sepa<b>rate</b>ly" — routed ordinary technical work to humans</td>
+          <td>a test written against my own bias</td>
+        </tr>
+        <tr>
+          <td>Evidence size</td>
+          <td><code>EXCERPT_CHARS = 1800</code></td>
+          <td>dead code — text arrived already cut to 300 chars, discarding 62% of it</td>
+          <td>comparing two paths' evidence</td>
+        </tr>
+        <tr>
+          <td>Score threshold</td>
+          <td>"validated below the observed minimum"</td>
+          <td>validated against a <em>different scale</em>; silently converted correct answers into gaps</td>
+          <td>comparing two retrievers' scores</td>
+        </tr>
+        <tr>
+          <td>API routes</td>
+          <td>compiled, tests green</td>
+          <td>wrong parameter syntax for this framework version — four endpoints matched nothing</td>
+          <td>calling them over HTTP</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <h3>The one that should worry us most</h3>
+    <p>
+      The score threshold failed by emitting <strong>"gap"</strong> — which is exactly what
+      an honest refusal looks like. <strong>A system that cannot answer and a system that
+      never tried are indistinguishable in the output.</strong> It would have shipped as
+      "the knowledge base doesn't cover this", and the review queue would have absorbed the
+      difference invisibly.
+    </p>
+    <p>
+      And one safety property passed a test run only because <em>two separate defects
+      cancelled out</em> — a truncated response hid a weakened rule. Fixing an unrelated
+      token limit turned a green result red. Had it not been touched, the central safety
+      claim would have shipped as an accident, with the golden set certifying it.
+    </p>
+  </div>
+
+  <div class="lane">
+    <span class="lane-tag">The takeaway for all of us</span>
+    <p>
+      Unit tests verify a module against its own assumptions. <strong>Every bug here was a
+      wrong assumption about how our code meets someone else's</strong> — a shared constant,
+      a retriever's score scale, a router's syntax. None of those live in the module under
+      test, so none were catchable there.
+    </p>
+    <p>
+      What found them, every time, was <strong>comparing two independent things and asking
+      why they disagreed.</strong>
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 10 ══════════════ -->
+<section id="left" class="reveal">
+  <div class="sec-head"><span class="sec-num">10</span><h2>What's left</h2></div>
+
+  <div class="phases">
+    <div class="phase done">
+      <div class="ph-id">P0</div>
+      <div class="ph-body"><h3>Prove the approach <span class="chip ok">done</span></h3>
+        <p>Golden set, retrieval baseline, the gap-detection finding, query-shape probe.</p></div>
+      <div class="ph-meta">measured</div>
+    </div>
+    <div class="phase done">
+      <div class="ph-id">P3</div>
+      <div class="ph-body"><h3>The response plane <span class="chip ok">done</span></h3>
+        <p>Routing, answering, persistence, mining. All validated against the golden set.</p></div>
+      <div class="ph-meta">measured</div>
+    </div>
+    <div class="phase block">
+      <div class="ph-id">P1</div>
+      <div class="ph-body"><h3>Multi-tenant foundation <span class="chip crit">blocks real customers</span></h3>
+        <p>Today a "tenant" is a single user, and the namespace is supplied by the caller rather than derived from who is logged in. Three separate holes found in live code. No real customer data can land until this is done.</p></div>
+      <div class="ph-meta">2–4 weeks</div>
+    </div>
+    <div class="phase next">
+      <div class="ph-id">P2</div>
+      <div class="ph-body"><h3>The real knowledge base <span class="chip warn">needs a decision</span></h3>
+        <p>Ingest many proposals rather than one. Includes validating the near-identical-document problem and choosing a model — $261 vs $16 for the same library.</p></div>
+      <div class="ph-meta">2–3 weeks</div>
+    </div>
+    <div class="phase">
+      <div class="ph-id">P4</div>
+      <div class="ph-body"><h3>Scoring and response structure</h3>
+        <p>Many RFPs assign points per section and mandate a response template. Turns "% of requirements covered" into "% of scored points covered".</p></div>
+      <div class="ph-meta">2–3 weeks</div>
+    </div>
+    <div class="phase">
+      <div class="ph-id">P5</div>
+      <div class="ph-body"><h3>The review screen</h3>
+        <p>Where a person works: matrix as a checklist, citations that jump to the source page, a queue of gaps for experts, approvals captured. Adoption lives or dies here.</p></div>
+      <div class="ph-meta">3–5 weeks</div>
+    </div>
+    <div class="phase">
+      <div class="ph-id">P6</div>
+      <div class="ph-body"><h3>Word and Excel output</h3>
+        <p>Assemble a house-template document with citations, and fill questionnaire spreadsheets. Nothing in the repo does this today.</p></div>
+      <div class="ph-meta">2–4 weeks</div>
+    </div>
+    <div class="phase">
+      <div class="ph-id">P7</div>
+      <div class="ph-body"><h3>The learning loop</h3>
+        <p>Every approved answer becomes verified library content. With no existing proposal library, this is how the product acquires its own raw material.</p></div>
+      <div class="ph-meta">1–2 weeks</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Why P3 came before P1.</b> The original plan put multi-tenancy first because it blocks
+    shipping. But Phase 0 moved the risk: we now know retrieval works, and the open question
+    became <em>does the product work at all</em>. P1 is weeks of security work that produces
+    no answer to that. So we built the product first — under a hard rule:
+    <b>no real customer data until P1 lands.</b>
+  </div>
+</section>
+
+<!-- ══════════════ 11 ══════════════ -->
+<section id="questions" class="reveal">
+  <div class="sec-head"><span class="sec-num">11</span><h2>What we need from you</h2></div>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Question</th><th>Why it matters</th><th>Blocks</th></tr></thead>
+      <tbody>
+        <tr><td><b>Government or commercial RFPs?</b> One industry or many?</td><td>Government RFPs are scored per section and mandate templates; commercial ones rarely are. Decides how much of P4 exists.</td><td class="num">P4</td></tr>
+        <tr><td><b>One file or a package?</b> Excel pricing sheets, addenda, attachments?</td><td>Intake currently takes a single file path.</td><td class="num">intake</td></tr>
+        <tr><td><b>Do RFPs get amended mid-cycle?</b></td><td>Confirms requirement versioning is core. Amended RFPs are also near-identical documents, which collides with the dedup defect.</td><td class="num">data model</td></tr>
+        <tr><td><b>Where do reviewers work</b> — our screen, or Word?</td><td>If reviewers will not leave Word, P6 moves ahead of P5.</td><td class="num">P5/P6 order</td></tr>
+        <tr><td><b>Is there a house template</b> the output must match?</td><td>Feeds document assembly directly.</td><td class="num">P6</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout acc">
+    <h3>And one conversation we should have internally</h3>
+    <p>
+      Namespace isolation is already a tracked platform work area. Our multi-tenant work
+      overlaps it in exactly <strong>one</strong> place — the retrieval gate — and their
+      design deliberately <em>keeps</em> records that carry no tenant label, because
+      structured data predates that label. That is correct for a single-tenant product and
+      a cross-tenant leak for a multi-tenant one.
+    </p>
+    <p>
+      <strong>The question is theirs to answer, not ours to work around:</strong> is that
+      rule negotiable, or does multi-tenant retrieval need its own gate that fails closed?
+      Ten minutes of conversation now, versus a merge conflict in a security boundary later.
+    </p>
+  </div>
+</section>
+
+<p style="color:var(--ink-faint); font-size:.82rem; border-top:1px solid var(--rule); padding-top:16px">
+  Every number here is measured and reproducible from the repository. This page is fully
+  self-contained — no network, no server, no build step. Open it straight from disk.
+</p>
+
+</div>
+
+<script>
+  // The diagrams are inlined SVG painted with the page's own CSS custom properties,
+  // so switching theme re-colours them with no re-render and no network.
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const root = document.documentElement;
+    const now = root.dataset.theme
+      || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    root.dataset.theme = now === 'dark' ? 'light' : 'dark';
+  });
+</script>
+<script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('shown'); io.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(n => io.observe(n));
+
+  // Animate bars when they scroll into view
+  const bio = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('.bar-fl').forEach((b, i) => {
+        setTimeout(() => { b.style.width = b.dataset.w + '%'; }, i * 140);
+      });
+      bio.unobserve(e.target);
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('[data-bars]').forEach(n => bio.observe(n));
+</script>
+</body>
+</html>

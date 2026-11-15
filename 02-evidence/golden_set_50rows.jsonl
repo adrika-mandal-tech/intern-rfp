@@ -1,0 +1,18 @@
+# DEPRECATED — Superseded by Task 1 (2026-08-18)
+#
+# This 50-row candidate golden set has been superseded by the Task 1 deliverables:
+# - your-work/worklist_A_random.jsonl (40 rows, random stratified sample)
+# - your-work/worklist_B_lockbox.jsonl (20 rows, lockbox over-sample)
+# - your-work/annotation-summary.md (full analysis with verification)
+#
+# Key improvements in Task 1 set:
+# - Explicit annotation rules (Scope, Staleness, Exhibits)
+# - Stratified sampling methodology (separate lists for distinct purposes)
+# - Daily verification via verify_quotes.py
+# - Documented traps, ambiguities, and confidence ratings
+# - 60 total rows (16 verified negatives/none vs. fewer here)
+#
+# Original file content preserved below for reference:
+#
+# {"req_id": "R002", "rfp_page": 19, "section": "Vendor Questionnaire / A. Vendor Background & General Information", "class": "experience", "requirement": "Provide a brief history of your organization, including your company's primary business focus, inclusive of acquisitions or mergers, how long you have been providing business banking including treasury management services and your experience providing such services to governmental and municipal entities.", "verdict": "answered", "kb_page": 13, "quote": "Our history dates back to 1863 when First National Bank of Cincinnati opened for business.", "verdict_c": "answered", "verdict_d": "answered", "page_c": 13, "page_d": 13, "tier": "corroborated", "annotators_agreed": true, "status": "accepted", "basis": "two independent annotators agreed; quote machine-verified", "query_form": "imperative"}
+# ... (49 more rows omitted — see original git history)
